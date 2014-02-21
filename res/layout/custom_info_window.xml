@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/white"
+    android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/marker_company_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:textColor="@color/black"
+            android:textStyle="bold" 
+            android:text="Company Name"/>
+        
+        <TextView
+            android:id="@+id/marker_address_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/gray" 
+            android:text="address 1"/>
+
+        <TextView
+            android:id="@+id/marker_address_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:textColor="@color/gray" 
+            android:text="address 2"/>
+        
+        <TextView
+            android:id="@+id/marker_num_offers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:maxLines="2"
+            android:textColor="@color/green"
+            android:textStyle="normal" 
+            android:text="Offers for this location"/>
+                
+        <TextView
+            android:id="@+id/click_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:maxLines="2"
+            android:textColor="@color/green"
+            android:textStyle="bold" 
+            android:text="Click to see Offers!"/>
+        
+</LinearLayout>

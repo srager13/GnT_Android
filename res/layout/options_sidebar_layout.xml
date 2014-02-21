@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="260dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    
+   	<FrameLayout 
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@color/gray"
+   	     android:padding="1dp"
+   	   >
+    <RelativeLayout
+	    android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:background="@color/black" >
+	   	<TextView
+	   	    android:id="@+id/optionTitle0"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:text="My Coupons"
+	   	    android:textSize="25sp"
+	   	    android:textColor="@color/gray" >
+	   	</TextView>
+	    <ImageView
+	        android:layout_width="44dip"
+	        android:id="@+id/optionPic0"
+	        android:layout_height="44dip"
+	    	android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="25dp"
+	    	android:layout_marginTop="10dp"
+	    	android:layout_alignParentRight="true"
+	    	android:contentDescription="@string/dummy_content"
+	        android:src="@drawable/ic_launcher"
+	    />    
+	</RelativeLayout>
+	</FrameLayout>
+    
+   	<FrameLayout 
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@color/gray"
+   	     android:padding="1dp"
+   	   >	
+    <RelativeLayout
+	    android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:background="@color/black" >
+	   	<TextView
+	   	    android:id="@+id/optionTitle"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:text="Add Coupons"
+	   	    android:textSize="25sp"
+	   	    android:textColor="@color/gray" >
+	   	    
+	   	</TextView>
+	    <ImageView
+	        android:layout_width="44dip"
+	        android:id="@+id/optionPic"
+	        android:layout_height="44dip"
+	    	android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="25dp"
+	    	android:layout_marginTop="10dp"
+	    	android:layout_alignParentRight="true"
+	    	android:contentDescription="@string/dummy_content"
+	        android:src="@drawable/ic_launcher"
+	    />    
+	</RelativeLayout>   
+	</FrameLayout>
+	
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Categories"
+        android:background="@color/gray"
+        android:textSize="20sp" >
+    </TextView>
+	    
+   	<FrameLayout 
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@color/gray"
+   	     android:padding="1dp"
+   	   >    
+    <RelativeLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:background="@color/black" >
+	   	<TextView
+	   	    android:id="@+id/optionTitle2"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:text="Share App"
+	   	    android:textSize="25sp"
+	   	    android:textColor="@color/gray" >
+	   	</TextView>
+	    <ImageView
+	        android:layout_width="44dip"
+	        android:id="@+id/optionPic2"
+	        android:layout_height="44dip"
+	    	android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="25dp"
+	    	android:layout_marginTop="10dp"
+	    	android:layout_alignParentRight="true"
+	    	android:contentDescription="@string/dummy_content"
+	        android:src="@drawable/ic_launcher"
+	    />
+	</RelativeLayout>   
+	</FrameLayout>
+	      
+	    
+   	<FrameLayout 
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@color/gray"
+   	     android:padding="1dp"
+   	   >    
+    <RelativeLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:background="@color/black" >
+	   	<TextView
+	   	    android:id="@+id/optionTitle5"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:text="My Profile"
+	   	    android:textSize="25sp"
+	   	    android:textColor="@color/gray" >
+	   	</TextView>
+	    <ImageView
+	        android:layout_width="44dip"
+	        android:id="@+id/optionPic5"
+	        android:layout_height="44dip"
+	    	android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="25dp"
+	    	android:layout_marginTop="10dp"
+	    	android:layout_alignParentRight="true"
+	    	android:contentDescription="@string/dummy_content"
+	        android:src="@drawable/ic_launcher"
+	    />
+	</RelativeLayout>   
+	</FrameLayout>
+	      
+   	<FrameLayout 
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@color/gray"
+   	     android:padding="1dp"
+   	   >  
+    <RelativeLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:background="@color/black" >
+	   	<TextView
+	   	    android:id="@+id/optionTitle6"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:text="Settings"
+	   	    android:textSize="25sp"
+	   	    android:textColor="@color/gray" >
+	   	</TextView>
+	    <ImageView
+	        android:layout_width="44dip"
+	        android:id="@+id/optionPic6"
+	        android:layout_height="44dip"
+	    	android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="25dp"
+	    	android:layout_marginTop="10dp"
+	    	android:layout_alignParentRight="true"
+	    	android:contentDescription="@string/dummy_content"
+	        android:src="@drawable/ic_launcher"
+	    />
+	</RelativeLayout>   
+	</FrameLayout>
+	      
+   	<FrameLayout 
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@color/gray"
+   	     android:padding="1dp"
+   	   >  
+    <RelativeLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:background="@color/black"
+    	android:onClick="onClickMoreInfo" >
+	   	<TextView
+	   	    android:id="@+id/gntMoreInfoButton"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:text="G &amp; T Information"
+	   	    android:textSize="25sp"
+	   	    android:textColor="@color/gray" >
+	   	</TextView>
+	    <ImageView
+	        android:layout_width="44dip"
+	        android:id="@+id/optionPic6"
+	        android:layout_height="44dip"
+	    	android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="25dp"
+	    	android:layout_marginTop="10dp"
+	    	android:layout_alignParentRight="true"
+	    	android:contentDescription="@string/dummy_content"
+	        android:src="@drawable/ic_launcher"
+	    />
+	</RelativeLayout>   
+	</FrameLayout>	    	    		    	    	    
+		      
+   	<FrameLayout 
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:background="@color/gray"
+   	     android:padding="1dp"
+   	   >  
+    <RelativeLayout
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:orientation="horizontal"
+    	android:background="@color/black"
+    	android:onClick="onClickLogOut" >
+	   	<TextView
+	   	    android:id="@+id/optionTitle8"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:text="Log out"
+	   	    android:textSize="25sp"
+	   	    android:textColor="@color/gray" >
+	   	</TextView>
+	    <ImageView
+	        android:layout_width="44dip"
+	        android:id="@+id/optionPic6"
+	        android:layout_height="44dip"
+	    	android:layout_marginLeft="10dp"
+	    	android:layout_marginRight="25dp"
+	    	android:layout_marginTop="10dp"
+	    	android:layout_alignParentRight="true"
+	    	android:contentDescription="@string/dummy_content"
+	        android:src="@drawable/ic_launcher"
+	    />
+	</RelativeLayout>   
+	</FrameLayout>	 
+
+</LinearLayout>

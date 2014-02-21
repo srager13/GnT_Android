@@ -1,0 +1,44 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/srch_new_bckgrnd"
+    android:orientation="vertical"
+    tools:context=".MainActivity" >
+
+    <LinearLayout 
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >	
+	    <Button
+	        android:id="@+id/browse_coupons_button"
+			android:layout_width="213dp"
+			android:layout_height="54dp"
+			android:layout_marginBottom="50dp"
+	        android:onClick="browseCoupons"
+			android:background="@drawable/my_coupons_button_selector" />
+
+	    <Button
+	        android:id="@+id/choose_search_button"
+			android:layout_width="213dp"
+	        android:layout_height="54dp"
+	        android:onClick="searchNewCoupons"
+	        android:background="@drawable/buy_a_book_button" />
+
+	</LinearLayout>
+	
+	    <Button
+	        android:id="@+id/fundraise_with_us_button"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+			android:layout_alignParentBottom="true"
+			android:layout_centerHorizontal="true"
+			android:paddingBottom="15dp"
+	        android:background="@null"
+	        android:onClick="goToWebpage"
+	        android:text="@string/fundraise_with_us_string" />
+
+</RelativeLayout>

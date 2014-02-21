@@ -1,0 +1,67 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/srch_new_bckgrnd"
+    android:orientation="vertical"
+    android:gravity="center_vertical"
+    tools:context=".LoginActivity" >
+
+    <TextView
+        android:id="@+id/usernameText"
+        android:layout_alignParentTop="true"
+		android:layout_marginTop="105dp"
+	    android:layout_marginBottom="20dp"
+	    android:layout_marginLeft="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/username" />
+
+    <EditText
+        android:id="@+id/UserNameBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/usernameText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="20dp"
+        android:inputType="text" />
+    
+    <TextView
+        android:id="@+id/passwordText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/UserNameBox"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="20dp"
+        android:text="@string/password" />
+    
+    <EditText
+        android:id="@+id/PasswordBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="20dp"
+        android:inputType="textPassword" />
+    
+	<Button
+        android:id="@+id/submit_button"
+		android:layout_below="@id/PasswordBox"
+		android:layout_width="213dp"
+	    android:layout_height="54dp"
+	    android:layout_centerHorizontal="true"
+        android:onClick="onClickSubmit"
+		android:text="@string/login_string" />
+    
+	<Button
+        android:id="@+id/register_new_button"
+		android:layout_below="@id/submit_button"
+		android:layout_width="213dp"
+	    android:layout_height="54dp"
+	    android:layout_centerHorizontal="true"
+        android:onClick="onClickRegisterNew"
+		android:text="@string/register_string" />
+
+</RelativeLayout>

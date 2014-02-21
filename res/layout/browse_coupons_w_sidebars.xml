@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+    
+    <include
+        android:id="@+id/browse_coupons_mainpage"
+        layout="@layout/activity_browse_coupons"  />
+    
+    <include 
+        android:id="@+id/options_sidebar"
+        layout="@layout/options_sidebar_layout"
+        android:visibility="invisible"  />
+    
+</FrameLayout>

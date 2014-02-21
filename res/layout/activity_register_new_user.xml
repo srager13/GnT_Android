@@ -1,0 +1,134 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bckgrnd_color"
+    android:orientation="vertical"
+    tools:context=".LoginActivity" >
+
+    <TextView
+        android:id="@+id/usernameText"
+        android:layout_alignParentTop="true"
+		android:layout_marginTop="20dp"
+	    android:layout_marginBottom="0dp"
+	    android:layout_marginLeft="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/username" />
+
+    <EditText
+        android:id="@+id/UserNameBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/usernameText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:inputType="text" />
+    
+    <TextView
+        android:id="@+id/passwordText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/UserNameBox"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/password" />
+    
+    <EditText
+        android:id="@+id/PasswordBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:inputType="textPassword" />
+    
+    <TextView
+        android:id="@+id/passwordConfirmText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/PasswordBox"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/confirm_pw_string" />
+    
+    <EditText
+        android:id="@+id/PasswordConfirmBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordConfirmText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:inputType="textPassword" />
+    
+    <TextView
+        android:id="@+id/firstNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/PasswordConfirmBox"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/first_name_string" />
+    
+    <EditText
+        android:id="@+id/FirstNameBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/firstNameText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:inputType="text" />
+    
+    <TextView
+        android:id="@+id/lastNameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/FirstNameBox"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/last_name_string" />
+    
+    <EditText
+        android:id="@+id/LastNameBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/lastNameText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:inputType="text" />
+    
+    <TextView
+        android:id="@+id/emailText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/LastNameBox"
+        android:layout_marginLeft="30dp"
+        android:layout_marginBottom="0dp"
+        android:text="@string/email_string" />
+    
+    <EditText
+        android:id="@+id/EmailBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/emailText"
+        android:layout_marginLeft="40dp"
+        android:layout_marginRight="40dp"
+        android:layout_marginBottom="0dp"
+        android:inputType="textEmailAddress"  />
+        
+	<Button
+        android:id="@+id/register_new_button"
+		android:layout_below="@id/EmailBox"
+		android:layout_marginLeft="40dp"
+		android:layout_marginRight="40dp"
+        android:layout_height="wrap_content"
+		android:layout_width="wrap_content"
+        android:onClick="onClickRegisterNew"
+		android:text="@string/register_string" />
+
+</RelativeLayout>

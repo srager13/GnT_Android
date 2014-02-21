@@ -1,0 +1,80 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:orientation="vertical"
+    android:background="@drawable/srch_new_bckgrnd"
+    tools:context=".SearchNewCouponsActivity" >
+    
+    <LinearLayout
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+	    <TextView
+	        android:id="@+id/search_title_text"
+	        android:layout_marginTop="170dp"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/search_coupons_title_string"
+	        android:textSize="30sp"
+	        android:textColor="@color/blue">
+	    </TextView>
+	
+	    <LinearLayout
+	        android:orientation="horizontal"
+	        android:layout_height="wrap_content"
+	        android:layout_width="match_parent"
+			android:layout_marginLeft="20dp"
+			android:layout_marginRight="20dp" >
+	        
+	        <AutoCompleteTextView 
+	             
+	    		android:id="@+id/search_text_box"    	    
+	    		style="@style/EditTextBoxes"
+	    		android:layout_weight="1"
+	    	    android:layout_width="0dp"
+	    	    android:layout_height="wrap_content"
+	    	    android:hint="@string/search_hint"
+	    	    android:inputType="textCapWords" />  
+	    	    
+	    	<Button 
+	        	android:id="@+id/execute_search_button"
+	        	style="@style/ExecSearchButton"
+	        	android:layout_width="wrap_content"
+	        	android:layout_height="wrap_content"
+	        	android:minHeight="0dp"
+	        	android:minWidth="0dp"
+	        	android:text="@string/go_string"
+	        	android:onClick="startExecuteSearch"
+	        	/>
+	    </LinearLayout>
+	
+	    <Button
+	        android:id="@+id/no_group_button"
+	        style="@style/NoSpecCharButton"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_marginTop="40dp"
+	        android:text="@string/no_group_button_text"
+	        android:onClick="executeNoGroup" />
+	    
+	    <TextView
+	        android:id="@+id/no_group_explanation"
+	        android:layout_marginTop="20dp"
+	        android:layout_marginLeft="20dp"
+	        android:layout_marginRight="20dp"
+	        android:layout_gravity="center_horizontal"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="@string/no_group_explanation"
+	        android:textSize="15sp"
+	        android:textColor="@color/black">
+	    	</TextView>
+	
+	</LinearLayout>
+	
+</RelativeLayout>

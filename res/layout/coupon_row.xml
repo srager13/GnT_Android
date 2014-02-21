@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+    
+    <LinearLayout android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="3dip"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dip">
+ 
+        <ImageView
+            android:id="@+id/couponSmallPic"
+            android:layout_width="44dip"
+            android:layout_height="44dip"
+        	android:layout_marginLeft="10dp"
+        	android:layout_marginRight="25dp"
+        	android:layout_marginTop="10dp"
+        	android:contentDescription="@string/picture_desc"
+            android:src="@drawable/ic_launcher"/>
+    </LinearLayout>
+    
+
+    <LinearLayout
+        android:id="@+id/couponDetailsBlock"
+        android:layout_alignTop="@id/thumbnail"
+        android:layout_toRightOf="@id/thumbnail"
+        android:orientation="vertical"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:width="0dp" >
+	   	<TextView
+	   	    android:id="@+id/couponName"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:textSize="25sp" >
+	   	</TextView>
+	   	
+	   	<TextView 
+	   	    android:id="@+id/couponDetails"
+	   	    android:layout_width="fill_parent"
+	   	    android:layout_height="wrap_content"
+	   	    android:width="0dp"
+	   	    android:textSize="15sp">
+	   	</TextView>
+	   	
+	   	<LinearLayout
+	   	    android:layout_width="wrap_content"
+	   	    android:layout_height="wrap_content"
+	   	    android:orientation="horizontal" >
+
+	   	    <TextView 
+	   	        android:id="@+id/couponExpDate"
+	   	        android:layout_width="wrap_content"
+	   	        android:layout_height="wrap_content"
+	   	        android:paddingRight="7dp"
+	   	        android:textSize="15sp"
+	   	        android:textColor="@color/lt_blue" >
+	   	    </TextView>
+	   	    <TextView
+	   	        android:id="@+id/couponDistance"
+	   	        android:layout_width="wrap_content"
+	   	        android:layout_height="wrap_content"
+	   	        android:textSize="15sp"
+	   	        android:textColor="@color/lt_blue" >
+	   	    </TextView>
+	   	</LinearLayout>
+	</LinearLayout>
+	
+	<LinearLayout
+	    android:id="@+id/favStarBlock"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true" >
+
+	   	<ImageView
+	   	    android:id="@+id/favStar"
+	       	android:layout_width="44dp"
+	       	android:layout_height="44dp"
+	       	android:contentDescription="@string/picture_desc"
+	       	android:src="@drawable/not_fav_star" >
+	   	</ImageView>
+   	</LinearLayout>
+</RelativeLayout>
