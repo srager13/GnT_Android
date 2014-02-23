@@ -1,0 +1,20 @@
+<resources>
+
+    <color name="black_overlay">#66000000</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="bckgrnd_color">#C3D69B</color>
+    <color name="button_bckgrnd_color">#CCCCCC</color>
+    <color name="button_pressed_color">#C3D69B</color>
+    <color name="list_item_selected">#666666</color>
+    <color name="button_font_color">#173761</color>
+    <color name="blue">#173761</color>
+    <color name="lt_blue">#8EB4E3</color>
+    <color name="black">#000000</color>
+    <color name="red">#FF0000</color>
+    <color name="gray">#888888</color>
+    <color name="green">#C3D69B</color>
+    <color name="yellow">#FFFF33</color>
+
+    
+</resources>

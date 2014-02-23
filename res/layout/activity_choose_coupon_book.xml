@@ -1,0 +1,60 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+	android:orientation="vertical"
+    android:background="@drawable/srch_new_bckgrnd"
+    tools:context=".ChooseCouponBookActivity" >
+    
+    <TextView
+        android:id="@+id/chosen_group"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="200dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="30sp"
+        android:textColor="@color/black">
+    </TextView>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp" >
+        
+    	<ListView
+    	    android:id="@+id/coupon_book_choices"
+    	    android:layout_width="fill_parent"
+    	    android:layout_height="wrap_content"
+    	    android:choiceMode="singleChoice" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_marginBottom="40dp"
+		 >
+    	    
+    	<Button 
+        	android:id="@+id/buy_book_button"
+			android:layout_width="105dp"
+			android:layout_height="48dp"
+			android:background="@drawable/buy_button"
+        	android:layout_marginRight="10dp"
+        	android:onClick="BuyBook"
+        	/>
+    	    
+    	<Button 
+        	android:id="@+id/preview_book_button"
+			android:layout_width="105dp"
+			android:layout_height="48dp"
+			android:background="@drawable/preview_button"
+        	android:layout_marginLeft="10dp"
+        	android:onClick="PreviewBook"
+        	/>
+    </LinearLayout>
+</LinearLayout>

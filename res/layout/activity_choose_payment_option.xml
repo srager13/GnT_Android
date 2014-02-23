@@ -1,0 +1,52 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/srch_new_bckgrnd"
+    tools:context=".ChoosePaymentOptionActivity" >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="180dp"
+        android:text="@string/choose_payment_option_string"
+        android:textSize="25sp" />
+
+    <LinearLayout 
+        android:orientation="vertical"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+		android:layout_marginTop="20dp"
+        >
+        
+		<Button
+			android:id="@+id/choose_in_app_pay_button"
+			style="@style/HomeScreenButtons"
+			android:layout_width="213dp"
+			android:layout_height="54dp"
+			android:background="@drawable/google_play"
+			android:onClick="onChooseInAppPay" />
+		<Button
+			android:id="@+id/choose_credit_card_pay_button"
+		   	style="@style/HomeScreenButtons"
+			android:layout_width="213dp"
+			android:layout_height="54dp"
+			android:layout_gravity="center_horizontal"
+			android:layout_marginTop="20dp"
+			android:background="@drawable/credit_card_button"
+		    android:onClick="onChooseCreditCardPay" />
+		<Button
+		    android:id="@+id/choose_cash_pay_button"
+		    style="@style/HomeScreenButtons"
+			android:layout_width="213dp"
+			android:layout_height="54dp"
+			android:layout_gravity="center_horizontal"
+			android:layout_marginTop="20dp"
+			android:background="@drawable/cash_button"
+		    android:onClick="onChooseCashPay" />
+
+    </LinearLayout>
+</LinearLayout>
