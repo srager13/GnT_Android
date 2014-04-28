@@ -3,12 +3,17 @@ package org.scottrager.appfunding;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -59,8 +64,11 @@ public class LoginActivity extends Activity {
 
 	public void onClickSubmit ( View view ) {
 
+		Log.d(TAG, "Clicked Login");
 		if( IsConnected() ) {
-		new ValidateLogin().execute();
+	    	String username = ((EditText)findViewById(R.id.UserNameBox)).getText().toString();
+	    	String passwordHash = ((EditText)findViewById(R.id.PasswordBox)).getText().toString();
+		new ValidateLogin().execute(username, passwordHash);
 		}
 		else
 		{
@@ -76,7 +84,7 @@ public class LoginActivity extends Activity {
         b.putString("username", username);
         b.putString("passwordHash", passwordHash);
         intent.putExtras(b);
-        startActivity(intent);
+        startActivity(intent); //TODO:  start activity for result and only finish if registration is continued
         finish();
 	}
 	
@@ -89,35 +97,30 @@ public class LoginActivity extends Activity {
 		
 	}
 
-    private class ValidateLogin extends AsyncTask<URL, Integer, Long> {
+    private class ValidateLogin extends AsyncTask<String, Integer, Long> {
     	
 
     	@Override
-    	protected Long doInBackground(URL... params) {
+    	protected Long doInBackground(String... params) {
+    		
+    		Log.d(TAG, "New ValidateLogin task");
     	//TODO::Need to make sure arguments are safe
-    	String username = ((EditText)findViewById(R.id.UserNameBox)).getText().toString();
-    	String passwordHash = ((EditText)findViewById(R.id.PasswordBox)).getText().toString();
-    	
-    	JSONObject loginInfo = new JSONObject();
-    	try {
-        	loginInfo.put("user", username);
-			loginInfo.put("pwHash", passwordHash);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+    	String username = params[0];
+    	String passwordHash = params[1];
     	Log.d(TAG, "Username = "+username);
     	Log.d(TAG, "Password = "+passwordHash);
 		try {
 		// need to send json object "loginInfo" to server  
 		HttpParams httpParams = new BasicHttpParams();
-        HttpConnectionParams.setConnectionTimeout(httpParams,
-                10000);
+        HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
         HttpConnectionParams.setSoTimeout(httpParams, 10000);
 		HttpClient client = new DefaultHttpClient(httpParams);
 		HttpPost request = new HttpPost("http://166.78.251.32/gnt/validate_login.php");
-	        request.setHeader("json", loginInfo.toString());
-	        request.getParams().setParameter("jsonpost", loginInfo);
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+	       nameValuePairs.add(new BasicNameValuePair("username", username));
+	       nameValuePairs.add(new BasicNameValuePair("pwHash", passwordHash));
+	       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+
 	        HttpResponse response = client.execute(request);
 	        HttpEntity entity = response.getEntity();
 	        if (entity != null) {
@@ -137,15 +140,17 @@ public class LoginActivity extends Activity {
 	         
 	            ByteArrayBuffer baf = new ByteArrayBuffer(500);
 	            int current = 0;
-	            while( (current = in.read()) != -1 ) {
+	            int byteCount = 0;
+	            while( (current = in.read()) != -1 && ++byteCount < 500 ) {
 	            	baf.append((byte) current);
-	            	Log.d(TAG, "byte = "+current);
+	            	Log.d(TAG, "byte = "+(char)current);
 	            }
 	            in.close();
-	            //Log.d(TAG, "BAF: "+baf.toString());
+	            Log.d(TAG, "BAF: "+baf.toByteArray().toString());
 	            JSONObject json = new JSONObject(new String(baf.toByteArray(), "utf-8"));
 
-	            if( json.getBoolean(SUCCESS) )
+	            //if( json.getBoolean(SUCCESS) )
+	            if( json.getString("success").equals("true") )
 	            {
 	            	return (long) 1;
 	            }
@@ -168,6 +173,7 @@ public class LoginActivity extends Activity {
     	protected void onPostExecute(Long result) {
     		if( result != null )
     		{
+    			Log.d(TAG, "Valid username and pw...saving and continuing");
     			// store valid login in and pw
     			SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
     			SharedPreferences.Editor editor = prefs.edit();
@@ -185,6 +191,7 @@ public class LoginActivity extends Activity {
     		}
     		else
     		{
+    			Log.d(TAG, "Invalid username and pw");
     			Toast.makeText(getApplicationContext(), "Username/Password Not Recognized.\nPlease Try Again.", Toast.LENGTH_LONG).show();
     		}
     	}

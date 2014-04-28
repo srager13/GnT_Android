@@ -47,7 +47,7 @@ public class ChooseCouponBookActivity extends FragmentActivity {
 	static final int BOOK_PURCHASED = 1;
 	
 	private ArrayList<String> couponBookNames;
-	private ArrayList<String> couponBookPrices;
+	private ArrayList<Integer> couponBookPrices;
 	private ArrayList<String> couponBookValues;
 	private ArrayList<Integer> couponBookNumbers;
 	private int selectedBookPosition = -1;
@@ -64,7 +64,7 @@ public class ChooseCouponBookActivity extends FragmentActivity {
 		Log.d(TAG, "in onCreate() of ChooseCouponBookActivity");
 
 		couponBookNames = new ArrayList<String>();
-		couponBookPrices = new ArrayList<String>();
+		couponBookPrices = new ArrayList<Integer>();
 		couponBookValues = new ArrayList<String>();
 		couponBookNumbers = new ArrayList<Integer>();
 
@@ -128,10 +128,11 @@ public class ChooseCouponBookActivity extends FragmentActivity {
 		}
 		int coupon_book_id = couponBookNumbers.get(position);
 		
-		Log.d(TAG, "trying to buy book "+coupon_book_id);
+		Log.d(TAG, "trying to buy book "+coupon_book_id+", with cost = "+couponBookPrices.get(position));
 		
 		Intent intent = new Intent( this, EnterSellerIdDialog.class );
 		intent.putExtra("couponBookId", coupon_book_id);
+		intent.putExtra("couponBookCost", couponBookPrices.get(position));
 		
 		// TODO:: start activity for result and finish this activity if sale completes?
 		startActivityForResult(intent, BOOK_PURCHASED);
@@ -156,6 +157,7 @@ public class ChooseCouponBookActivity extends FragmentActivity {
 		Intent intent = new Intent( this, PreviewCouponsActivity.class );
 		intent.putExtra("couponBookId", coupon_book_id);
 		Log.d(TAG, "trying to preview book "+coupon_book_id);
+		intent.putExtra("couponBookValue", couponBookValues.get(position));
 		startActivityForResult(intent, BOOK_PURCHASED);
 	}
 	
@@ -237,7 +239,7 @@ public class ChooseCouponBookActivity extends FragmentActivity {
     	    	        
     	    	        couponBookNumbers.add(coupon_book_id);
     	    			couponBookNames.add("Coupon Book "+coupon_book_id);
-    	    			couponBookPrices.add("Cost: $"+cost);
+    	    			couponBookPrices.add(cost);
     	    			couponBookValues.add(" - Over $"+value+" in Total Value!");
     	    	    }
 	            }

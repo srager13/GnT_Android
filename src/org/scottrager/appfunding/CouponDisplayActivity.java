@@ -1,5 +1,7 @@
 package org.scottrager.appfunding;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
@@ -84,12 +86,42 @@ public class CouponDisplayActivity extends FragmentActivity {
 			   Toast.makeText(this, "Please purchase the book to use!", Toast.LENGTH_LONG).show();
 			   return;
 		   }
-			Intent intent = new Intent( this, EnterCoupConfirmCode.class );
-			Bundle b = new Bundle();
-	        b.putString("couponDetail", couponDetail);
-	        intent.putExtras(b);
-	        startActivityForResult(intent, COUPON_REDEEMED_REQUEST);
-			return;
+
+		   //Toast.makeText(this, "Coupon Details = "+couponDetail, Toast.LENGTH_LONG).show();
+		   
+	        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+	        builder.setTitle(R.string.use_coupon_title);
+	        builder.setMessage(R.string.coupon_use_confirm_message)
+	               .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+	                   public void onClick(DialogInterface dialog, int id) {
+	                     // Use Coupon
+	                	   
+	               		// return value back to coupon display activity so it knows to finish()
+	               		//Intent returnData = new Intent();
+	               		//setResult(RESULT_OK, returnData);
+	               		
+	               		//Then go to thank you page
+	               		Intent intent = new Intent(CouponDisplayActivity.this, CouponUsedDisplay.class);
+	               		intent.putExtra("couponDetails", couponDetail);
+	               		startActivity(intent);
+	               		CouponDisplayActivity.this.finish();
+	                   }
+	               })
+	               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+	                   public void onClick(DialogInterface dialog, int id) {
+	                       // Cancelled - return to coupon without using
+	                   }
+	               });
+	        // Create the AlertDialog object and return it
+	        builder.show();
+		   
+//			Intent intent = new Intent( this, EnterCoupConfirmCode.class );
+//			Bundle b = new Bundle();
+//	        b.putString("couponDetail", couponDetail);
+//	        intent.putExtras(b);
+//	        startActivityForResult(intent, COUPON_REDEEMED_REQUEST);
+			
+	        return;
 	}
 	
 	protected void onActivityResult(int requestCode, int resultCode, Intent data ) {

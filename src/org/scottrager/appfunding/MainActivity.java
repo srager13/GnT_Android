@@ -26,7 +26,6 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	public final String IpAddress = "192.168.1.65";
 	public static final String TAG = "mainactivity";
 	public static final String PREFS_FILE = "GiveAndTakePrefs";
 	public static final String USERNAME = "Username";
@@ -69,8 +68,6 @@ public class MainActivity extends Activity {
     		Log.d(TAG, "Not first time opened.");
     	}
     	
-//    	new GetJSONFile().execute();
-
     }
 	@Override
 	public void onStart() {
@@ -97,7 +94,6 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
-    
     
     public void searchNewCoupons( View view ) {
     	Intent intent = new Intent( this, SearchNewCouponsActivity.class );
@@ -147,27 +143,7 @@ public class MainActivity extends Activity {
         }
         return false;
     }
-    
-    private void goToSearchCoupons() {
-    	Intent intent = new Intent(this, SearchNewCouponsActivity.class );
-		startActivity( intent );
-    }
-	
-    /*
-	public void onActivityResult( int requestCode, int resultCode, Intent data ) 
-	{
-		Log.d(TAG, "Entered OnActivityResult()");
-		super.onActivityResult( requestCode,  resultCode,  data );
-		if( requestCode == splash_screen_Code )
-		{
-			if( resultCode == RESULT_OK )
-			{
-				goToSearchCoupons();
-			}
-		}
-	}
-	*/
-	
+    	
 	private ServiceConnection mConnection = new ServiceConnection() {
 	    public void onServiceConnected(ComponentName className,
 	            IBinder service) {

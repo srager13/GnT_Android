@@ -1,12 +1,34 @@
 package org.scottrager.appfunding;
 
+import java.io.BufferedInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.ByteArrayBuffer;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -22,6 +44,7 @@ public class SearchNewCouponsActivity extends Activity {
 //    private ProgressDialog progressDialog;
     //private ArrayList<String> searchResults;
     private ArrayList<String> searchSuggestions;
+    ProgressDialog dialog;
     
     public final boolean USE_TEST_URL = true;
     static final int BOOK_PURCHASED = 1;
@@ -35,16 +58,10 @@ public class SearchNewCouponsActivity extends Activity {
 		setContentView(R.layout.activity_search_new_coupons);
 		
 		searchSuggestions = new ArrayList<String>();
-		searchSuggestions.add("Ferndale Hockey");
-		searchSuggestions.add("Ferndale Football");
-		searchSuggestions.add("Ferndale Baseball");
-		searchSuggestions.add("Pittsburgh Charity X");
-		searchSuggestions.add("Pittsburgh Charity Y");
-		searchSuggestions.add("Pittsburgh Charity Z");
-		searchSuggestions.add("Girl Scouts Troop 32");
-		
+		new getCharities().execute();
+
 		AutoCompleteTextView editBox = (AutoCompleteTextView) findViewById( R.id.search_text_box );
-		ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, searchSuggestions );
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(SearchNewCouponsActivity.this, android.R.layout.simple_list_item_1, searchSuggestions );
 		editBox.setAdapter(adapter);
 	}
 
@@ -123,4 +140,111 @@ public class SearchNewCouponsActivity extends Activity {
 	private void DisplayNoConnectionToast() {
 		Toast.makeText(getApplicationContext(), "No network connection detected.\nPlease try again later.", Toast.LENGTH_LONG).show();
 	}
+	
+	private class getCharities extends AsyncTask<String, Integer, Boolean> {
+
+    	@Override
+    	protected Boolean doInBackground(String... params) {
+    
+		Log.d(TAG, "Trying to get charities for search suggestions");
+
+		try {  
+		HttpParams httpParams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpParams,
+                10000);
+        HttpConnectionParams.setSoTimeout(httpParams, 10000);
+		HttpClient client = new DefaultHttpClient(httpParams);
+		HttpPost request = new HttpPost("http://166.78.251.32/gnt/get_all_charities.php");
+
+	        HttpResponse response = client.execute(request);
+	        HttpEntity entity = response.getEntity();
+	        if (entity != null) {
+	            InputStream is = entity.getContent();
+	            BufferedInputStream in;
+				if( is != null )
+				{
+					Log.d(TAG, "got input stream from urlConnection");
+					in = new BufferedInputStream(is);
+				}
+				else
+				{
+					Log.d(TAG, "urlConnection.getInputStream() failed");
+					return null;
+				}
+		        Log.d(TAG, "got input stream");
+	         
+	            ByteArrayBuffer baf = new ByteArrayBuffer(1000);
+	            int current = 0;
+	            while( (current = in.read()) != -1 ) {
+	            	baf.append((byte) current);
+	            	//Log.d(TAG, "byte = "+current);
+	            }
+	            in.close();
+	            Log.d(TAG, "BAF: "+baf.toString());
+	            JSONObject json = new JSONObject(new String(baf.toByteArray(), "utf-8"));
+
+	            if( json.getString("error").equals("none") )
+	            {    		
+	            	JSONArray charities = null;
+		    		try {
+		    			Log.d(TAG, "No error returned from json call");
+		    			charities = json.getJSONArray("charities");
+
+			    	    // looping through All Charities
+			    	    for(int i = 0; i < charities.length(); i++){
+			    	        JSONObject c = charities.getJSONObject(i);
+			    	        Log.d(TAG, "charity: id="+c.getInt("charity_id")
+			    	        		+", name="+c.getString("name"));
+			    	        
+			    	        searchSuggestions.add(c.getString("name"));
+			    	    }	    		
+		    		} catch (JSONException e) {
+		    			e.printStackTrace();
+	    	    	return false;
+		    		}
+	            }
+	            else
+	            {
+	            	Log.d(TAG, "JSON request returned the following error: "+json.getString("error"));
+	            }
+	            //String result = EntityUtils.toString(entity);
+	            //Log.d(TAG, "Read from server:" + result);
+	        }
+	        else
+	        {
+	        	Log.d(TAG, "Entity was null");
+	        }
+		} catch (Throwable t) {
+			Log.d(TAG,  "Error in the Http Request somewhere.");
+			t.printStackTrace();
+			return false;
+		}
+
+ 		return true;
+    	}
+
+
+		@Override
+		protected void onPreExecute()
+		{
+            dialog= new ProgressDialog(SearchNewCouponsActivity.this);
+            dialog.setIndeterminate(true);
+//            dialog.setIndeterminateDrawable(getResources().getDrawable(R.anim.progress_dialog_anim));
+            dialog.setCancelable(false);
+            dialog.setMessage("Getting Charities...");
+            dialog.show();
+		}
+	     
+    	@Override
+		protected void onPostExecute( Boolean result )
+    	{
+    		dialog.dismiss();
+    		if( !result )
+    		{
+    			Toast.makeText(getApplicationContext(), "An unknown error has occurred.\nPlease try again.", Toast.LENGTH_LONG).show();
+    		}
+    	}
+	}
+	
+	
 }

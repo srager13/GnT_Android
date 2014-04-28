@@ -392,31 +392,16 @@ public class DBAdapter {
 	// this will need to do more...probably need to accept company_id as input, query that table
 	//   and then query locations database and return results...will have to decide if we should 
 	//   calculate distances and limit results here (probably) or from place where call is made
-	public Cursor getLocations()  // TODO:: This needs fixed
+	public Cursor getLocations()
 	{
-//		DATABASE_CREATE_3 = "create table "+DATABASE_LOCATIONS_TABLE
-//				+" (company_id integer, "
-//				+ "location_id integer, address_line_1 text, address_line_2 text, latitude float, longitude float, "
-//				+ "FOREIGN KEY (company_id) REFERENCES company(company_id) );";
-		
-
 		// should we only return locations that we have coupons for?
 		//Cursor c = db.query( DATABASE_LOCATIONS_TABLE, new String[]{"company_id", "latitude", "longitude"}, "company_id=?", new String[]{"1"}, null, null, null, null);
-		//String query = "SELECT * from locations";// + DATABASE_LOCATIONS_TABLE;
-		//Cursor c = db.rawQuery(query, null);
 		Cursor c = db.rawQuery("SELECT * FROM locations",  null);
 		
 		if( c == null )
 			Log.d(TAG, "locations query returned null");
 		
 		return c;
-		
-//		String query = "SELECT * "
-//				+ " FROM locations";
-//		Log.d(TAG, "In getLocations:  query = "+query);
-//		Cursor c = db.rawQuery(query, new String[]{});
-//		Log.d(TAG, "query returned "+c.getCount()+" results.");
-//		return c;
 	}
 
 	// need to make a query that joins all tables
@@ -426,19 +411,25 @@ public class DBAdapter {
 		String query = "SELECT * "
 				+ "FROM company "
 				+ "WHERE company.company_id="+id+" ";
+		Log.d(TAG, "Executing query: "+query);
 		Cursor c = db.rawQuery(query, null);
-		
+		Log.d(TAG, "Num responses = "+c.getCount());
 		return c;
 	}
 	
 	public int getNumCouponsFromId( int id )
 	{
+		// SELECT * FROM events,company,coupons 
+		//            WHERE events.coupon_id=coupons.coupon_id
+		//            AND   events.date_used IS NULL
+		//            AND   company.company_id=1
+		//            AND   coupons.comany_id=company.company_id
 		String query = "SELECT * "
-				+ "FROM coupon_event,company,coupon "
-				+ "WHERE coupon_event.coupon_id=coupon.coupon_id "
-				+ "AND coupon_event.date_used IS NULL "
-				+ "AND company.company_id=1 "
-				+ "AND coupon.company_id=company.company_id";
+				+ "FROM "+DATABASE_EVENTS_TABLE+","+DATABASE_COMPANY_TABLE+","+DATABASE_COUPONS_TABLE+" "
+				+ "WHERE "+DATABASE_EVENTS_TABLE+"."+KEY_COUPONID+"="+DATABASE_COUPONS_TABLE+"."+KEY_COUPONID+" "
+				+ "AND "+DATABASE_EVENTS_TABLE+"."+KEY_DATE_USED+" IS NULL "
+				+ "AND "+DATABASE_COMPANY_TABLE+"."+KEY_COMPANYID+"=1 "
+				+ "AND "+DATABASE_COUPONS_TABLE+"."+KEY_COMPANYID+"="+DATABASE_COMPANY_TABLE+"."+KEY_COMPANYID;
 		
 		Cursor c = db.rawQuery(query, null);
 		Log.d(TAG, "In getNumCouponsFromId: companyId "+ id + " returns "+ c.getCount() +" coupons.");

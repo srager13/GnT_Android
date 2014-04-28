@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="navigation_options">
+        <item>My Coupons</item>
+        <item>@string/get_new_coupons_string</item>
+        <item>Share on FB</item>
+        <item>My Profile</item>
+        <item>Settings</item>
+        <item>G and T Info</item>
+        <item>Logout</item>
+    </array>
+</resources>

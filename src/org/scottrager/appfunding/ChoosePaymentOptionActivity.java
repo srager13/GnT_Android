@@ -41,8 +41,10 @@ public class ChoosePaymentOptionActivity extends Activity {
 	public final String TAG = "choosepaymentoption";
 	private DBAdapter db;
 	private int coupon_book_id;
-
-	static final int BOOK_PURCHASED = 1;
+	private int coupon_book_cost;
+	private String seller_id;
+	
+	static final int VALID_CASH_CODE = 1;
 	
 	ProgressDialog dialog;
 	
@@ -56,6 +58,8 @@ public class ChoosePaymentOptionActivity extends Activity {
 		Intent i = getIntent();
 		Bundle b = i.getExtras();
 		coupon_book_id = b.getInt("couponBookId");
+		coupon_book_cost = b.getInt("couponBookCost");
+		seller_id = b.getString("sellerId");
 		db = new DBAdapter(this);
 	}
 
@@ -93,15 +97,32 @@ public class ChoosePaymentOptionActivity extends Activity {
 	
 	public void onChooseCashPay( View view ) {
 		Log.d(TAG, "chose to pay with cash");
+		Log.d(TAG, "coupon book cost = "+coupon_book_cost);
+		Log.d(TAG, "seller id = "+seller_id);
 		
 		if( !IsConnected() )
 		{
 			DisplayNoConnectionToast();
 			return;
 		}
-		// TODO:: Need to verify payment
-		new addCoupons().execute();
 
+		Intent intent = new Intent( this, EnterCashCodeDialog.class );
+		intent.putExtra("couponBookCost", coupon_book_cost);
+		intent.putExtra("sellerId", seller_id);
+		
+		startActivityForResult(intent, VALID_CASH_CODE);
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+	    // Check which request we're responding to
+	    if (requestCode == VALID_CASH_CODE) {
+	        // Make sure the request was successful
+	        if (resultCode == RESULT_OK) {
+	            // The user entered a valid cash code
+	    		new addCoupons().execute();	        	
+	        }
+	    }
 	}
 	
 	private boolean IsConnected() {
@@ -126,13 +147,7 @@ public class ChoosePaymentOptionActivity extends Activity {
 		db.open();
     
 		Log.d(TAG, "Trying to get coupons for book = "+coupon_book_id+", user="+username);
-//		JSONObject info = new JSONObject();
-//		try {
-//			info.put("username", username);
-//			info.put("couponBookId", coupon_book_id);
-//		} catch (JSONException e1 ) {
-//			e1.printStackTrace();
-//		}
+
 		try {
 		// need to send json object "user" to server  
 		HttpParams httpParams = new BasicHttpParams();
@@ -146,8 +161,6 @@ public class ChoosePaymentOptionActivity extends Activity {
 	       nameValuePairs.add(new BasicNameValuePair("couponBookId", String.valueOf(coupon_book_id)));
 	       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
-	       //request.setHeader("json", info.toString());
-	       // request.getParams().setParameter("jsonpost", info);
 	        HttpResponse response = client.execute(request);
 	        HttpEntity entity = response.getEntity();
 	        if (entity != null) {

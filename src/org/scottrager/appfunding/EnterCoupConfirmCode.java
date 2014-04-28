@@ -38,10 +38,6 @@ public class EnterCoupConfirmCode extends Activity {
 	}
 	
 	public void onSubmit( View view ) {
-		EditText et = (EditText)findViewById(R.id.seller_code_input_box);
-		String sellerId = new String(et.getText().toString());
-		//TODO:  Check confirmation code
-
 		// return value back to coupon display activity so it knows to finish()
 		Intent returnData = new Intent();
 		setResult(RESULT_OK, returnData);

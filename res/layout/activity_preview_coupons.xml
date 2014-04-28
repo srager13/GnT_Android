@@ -1,34 +1,46 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".BrowseCouponsActivity" >
         
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/browse_coupons_title_bar"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bckgrnd_color"
-        android:orientation="horizontal" >
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:background="@color/bckgrnd_color" >
+    
+        <ImageView 
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:src="@drawable/title_bar"
+            android:contentDescription="@string/dummy_content"
+            android:layout_centerHorizontal="true"/>
+        
         <Button 
             android:id="@+id/buy_book_button"
-            android:layout_width="wrap_content"
+            style="@style/SortCouponButtons"
+            android:layout_width="50dp"
             android:layout_height="50dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
 			android:text="@string/buy_string"
 			android:onClick="onClickBuyButton"/>
-        <ImageView android:id="@+id/browse_coupons_title_bar_logo"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:src="@drawable/browse_coupons_title"
-            android:contentDescription="@string/dummy_content"/>
+
         <Button
             android:id="@+id/launch_categories_button"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="5dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/categories_button"/>
-    </LinearLayout>
+    </RelativeLayout>
     
     <LinearLayout
         android:id="@+id/coupon_search_bar_and_button"
@@ -37,8 +49,8 @@
         android:layout_below="@id/browse_coupons_title_bar"
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
-        android:paddingTop="5dp"      
-        android:paddingBottom="5dp"  
+        android:paddingTop="2dp"      
+        android:paddingBottom="2dp"  
         android:paddingRight="5dp"
         android:background="@color/button_bckgrnd_color"
         android:orientation="horizontal" >
@@ -58,6 +70,8 @@
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="3dp"
 	        android:text="@string/go_string"
+	        android:textSize="20sp"
+	        android:onClick="onSearchButtonClick"
 	        style="@style/ExecSearchButton" />
 	</LinearLayout>
     
@@ -76,7 +90,7 @@
             style="@style/SortCouponButtons"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_marginLeft="5dp"
             android:text="@string/nearest_string"
             android:onClick="sortByNearest" />
@@ -86,7 +100,7 @@
             style="@style/SortCouponButtons"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_marginLeft="5dp"
             android:text="@string/map_string"
             android:onClick="goToMap" />
@@ -96,7 +110,7 @@
             style="@style/SortCouponButtons"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_marginLeft="5dp"
             android:text="@string/ending_soon_string"
             android:onClick="sortByEndingSoon" />
@@ -106,7 +120,7 @@
             style="@style/SortCouponButtons"
             android:layout_weight="1"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:layout_marginLeft="5dp"
             android:text="@string/az_string"
             android:onClick="sortAlphabetically" />

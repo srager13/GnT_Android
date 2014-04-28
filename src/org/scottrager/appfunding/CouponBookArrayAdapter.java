@@ -13,12 +13,12 @@ import android.widget.TextView;
 public class CouponBookArrayAdapter extends ArrayAdapter<String> {
 	private final Context context;
 	private final ArrayList<String> couponBookNames;
-	private final ArrayList<String> couponBookCosts;
+	private final ArrayList<Integer> couponBookCosts;
 	private final ArrayList<String> couponBookValues;
 	private final ArrayList<Integer> couponBookNumbers;
 
 	public CouponBookArrayAdapter(Context context, ArrayList<String> couponBookNames, 
-			ArrayList<String> couponBookCosts, ArrayList<String> couponBookValues, 
+			ArrayList<Integer> couponBookCosts, ArrayList<String> couponBookValues, 
 			ArrayList<Integer> couponBookNumbers) {
 		super(context, R.layout.coupon_row, couponBookNames);
 		this.context = context;
@@ -39,7 +39,7 @@ public class CouponBookArrayAdapter extends ArrayAdapter<String> {
 	    coupBookName.setText(couponBookNames.get(position));
 	    
 	    TextView coupBookCost = (TextView) rowView.findViewById(R.id.couponBookCost);
-	    coupBookCost.setText(couponBookCosts.get(position));
+	    coupBookCost.setText("Cost: $"+couponBookCosts.get(position));
 	    
 	    TextView coupBookValue = (TextView) rowView.findViewById(R.id.couponBookValue);
 	    coupBookValue.setText(couponBookValues.get(position));

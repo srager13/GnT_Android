@@ -34,14 +34,14 @@ import android.view.Window;
 import android.widget.EditText;
 import android.widget.Toast;
 
-public class EnterSellerIdDialog extends Activity {
+public class EnterCashCodeDialog extends Activity {
 
 	private int coupon_book_id;
-	private String sellerId;
+	private String CashCode;
 	private int coupon_book_cost;
+	private String seller_id;
 	
-	static final int BOOK_PURCHASED = 1;
-	public final String TAG = "entersellerid";
+	public final String TAG = "entercashcode";
 
 	ProgressDialog dialog;
 	
@@ -49,87 +49,60 @@ public class EnterSellerIdDialog extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_enter_seller_id_dialog);
+		setContentView(R.layout.activity_enter_cash_code_dialog);
 		
-		sellerId = "";
+		CashCode = "";
 		
 		Intent intent = getIntent();
 		Bundle b = intent.getExtras();
-		coupon_book_id = b.getInt("couponBookId");
 		coupon_book_cost = b.getInt("couponBookCost");
-		
-		Log.d(TAG, "in EnterSellerId: ");
-		Log.d(TAG, "coupon book Cost = "+coupon_book_cost);
-	}
+		seller_id = b.getString("sellerId");
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_enter_seller_id_dialog, menu);
-		return true;
+		Log.d(TAG, "in EnterCashCodeDialog:");
+		Log.d(TAG, "coupon book cost = "+coupon_book_cost);
+		Log.d(TAG, "seller id = "+seller_id);
 	}
 	
 	public void onSubmit( View view ) {
-		EditText et = (EditText)findViewById(R.id.seller_code_input_box);
-		sellerId = new String(et.getText().toString());
+		EditText et = (EditText)findViewById(R.id.cash_code_input_box);
+		CashCode = new String(et.getText().toString());
 		
-		new validateSellerId().execute(sellerId);
-	}
-	
-	public void onNoSellerId( View view ) {
-		sellerId = new String("NoSeller");
-
-		goToChoosePayment();
+		new validateCashCode().execute(CashCode, seller_id, Integer.toString(coupon_book_cost) );
 	}
 	
 	public void onCancel( View view ) {
 		finish();
 	}
 	
-	private void goToChoosePayment() {
-		Intent intent = new Intent( this, ChoosePaymentOptionActivity.class );
-		intent.putExtra("sellerId", sellerId);
-		intent.putExtra("couponBookId", coupon_book_id);
-		intent.putExtra("couponBookCost", coupon_book_cost);
-		startActivityForResult(intent, BOOK_PURCHASED);
-	}
-
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		Log.d("choosecouponbook", "in EnterSellerIdDialog: onActivityResult.  resultCode = "+resultCode);
-        if (resultCode == RESULT_OK) {
-        	// user bought a coupon book, so we can kill this activity
-
-    		Log.d("choosecouponbook", "\tbook was purchased, so can finish");
-    		this.setResult(RESULT_OK);
-        	finish();
-        }
-	}
 	
-	private class validateSellerId extends AsyncTask<String, Integer, Boolean> {
+	private class validateCashCode extends AsyncTask<String, Integer, Boolean> {
 
     	@Override
     	protected Boolean doInBackground(String... params) {
     		
-		if( params.length < 1 )
+		if( params.length < 3 )
 		{
-			Toast.makeText(getApplicationContext(), "Seller not found.\nPlease check and try again.", Toast.LENGTH_LONG).show();
-			Log.d(TAG, "No sellerId passed into validateSellerId AsyncTask...exiting");
+			Toast.makeText(getApplicationContext(), "Code not found.\nPlease check and try again.", Toast.LENGTH_LONG).show();
+			Log.d(TAG, "paramater missing from passing into validateCashCode AsyncTask...exiting");
 			return false;
 		}
     	
-    	String sellerId = params[0];
-		Log.d(TAG, "Checking for existence of sellerId = "+sellerId);
+    	String CashCode = params[0];
+    	String sellerId = params[1];
+    	String coupon_book_cost = params[2];
+		Log.d(TAG, "Checking for existence of CashCode = "+CashCode+", sellerId = "+sellerId);
 
 		try {
-		// need to send json object "sellerId" to server  
+		// need to send json object "CashCode" to server  
 		HttpParams httpParams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParams, 10000);
         HttpConnectionParams.setSoTimeout(httpParams, 10000);
 		HttpClient client = new DefaultHttpClient(httpParams);
-		HttpPost request = new HttpPost("http://166.78.251.32/gnt/validate_seller_id.php");
-		   List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+		HttpPost request = new HttpPost("http://166.78.251.32/gnt/validate_cash_code.php");
+		   List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
 	       nameValuePairs.add(new BasicNameValuePair("seller_id", sellerId));
+	       nameValuePairs.add(new BasicNameValuePair("cash_code", CashCode));
+	       nameValuePairs.add(new BasicNameValuePair("book_cost", coupon_book_cost));
 	       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
 	        HttpResponse response = client.execute(request);
@@ -161,7 +134,7 @@ public class EnterSellerIdDialog extends Activity {
 
 	            if( !json.getString("success").equals("true") )
 	            {
-	            	Log.d(TAG, "Seller Id not validated");    		
+	            	Log.d(TAG, "Cash Code not validated");    		
 	            	return false;
 	            }
 	        }
@@ -182,11 +155,10 @@ public class EnterSellerIdDialog extends Activity {
 		@Override
 		protected void onPreExecute()
 		{
-            dialog= new ProgressDialog(EnterSellerIdDialog.this);
+            dialog= new ProgressDialog(EnterCashCodeDialog.this);
             dialog.setIndeterminate(true);
-//            dialog.setIndeterminateDrawable(getResources().getDrawable(R.anim.progress_dialog_anim));
             dialog.setCancelable(false);
-            dialog.setMessage("Searching for Seller...");
+            dialog.setMessage("Checking code...");
             dialog.show();
 		}
 	     
@@ -196,11 +168,14 @@ public class EnterSellerIdDialog extends Activity {
     		dialog.dismiss();
     		if( !result )
     		{
-    			Toast.makeText(getApplicationContext(), "Seller not found.\nPlease check and try again.", Toast.LENGTH_LONG).show();
+    			Toast.makeText(getApplicationContext(), "Code not valid.\nPlease check and try again.", Toast.LENGTH_LONG).show();
     		}
     		else
     		{
-    			goToChoosePayment();
+    			Intent resultIntent = new Intent();
+    			//resultIntent.putExtra(PUBLIC_STATIC_STRING_IDENTIFIER, tabIndexValue);
+    			setResult(Activity.RESULT_OK, resultIntent);
+    			finish();
     		}
     	}
 	}

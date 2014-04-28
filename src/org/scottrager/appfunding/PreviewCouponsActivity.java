@@ -58,6 +58,7 @@ public class PreviewCouponsActivity extends FragmentActivity {
     private ArrayList<CouponObject> coupons;
 
 	private int coupon_book_id = -1;
+	private int coupon_book_value = 0;
 	
 	ProgressDialog dialog;
 
@@ -74,6 +75,7 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		if( b != null )
 		{
 			coupon_book_id = b.getInt("couponBookId");
+			coupon_book_value = b.getInt("couponBookValue");
 			Log.d(TAG, "should get coupons for coupon book "+coupon_book_id);
 			
 			if( IsConnected() )
@@ -85,6 +87,7 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		{
 			Log.d(TAG, "ERROR: bundle from intent = null");
 		}
+		
 	}
 
 	
@@ -161,6 +164,7 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		return;
 	}
 	
+	
 	/*
 	public void onActivityResult( int requestCode, int resultCode, Intent data ) 
 	{
@@ -176,8 +180,8 @@ public class PreviewCouponsActivity extends FragmentActivity {
 			}
 		}
 	}
-	*/
-	
+*/	
+
 	public void sortByNearest( View view ) {
 		view.setSelected(true);
 		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
@@ -209,6 +213,7 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		startActivity(intent);
 	}
 	
+	
 	public double getDistance( double loc1, double loc2 )
 	{
 		return 0.0;
@@ -220,6 +225,7 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		
 		Intent intent = new Intent( this, EnterSellerIdDialog.class );
 		intent.putExtra("couponBookId", coupon_book_id);
+		intent.putExtra("coupondBookValue", coupon_book_value);
 		
 		// TODO:: start activity for result and finish this activity if sale completes?
 		startActivity(intent);

@@ -3,12 +3,17 @@ package org.scottrager.appfunding;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -54,7 +59,7 @@ public class RegisterNewUserActivity extends Activity {
 		{
 			username = b.getString("username");
 			((EditText)findViewById(R.id.UserNameBox)).setText(username);
-			//position = b.getInt("position");
+			//position = b.getInt("position");  
 		}
 	}
 
@@ -124,16 +129,7 @@ public class RegisterNewUserActivity extends Activity {
     	protected Long doInBackground(URL... params) {
     	//TODO::Need to make sure arguments are safe
     	Log.d( LoginActivity.TAG, "Attempting to register: username="+un+", password="+pw+", firstname="+fn+", lastname="+ln+", email="+email);
-		JSONObject userInfo = new JSONObject();
-		try {
-			userInfo.put("username", un);
-			userInfo.put("password", pw);
-			userInfo.put("firstName", fn);
-			userInfo.put("lastName", ln);
-			userInfo.put("email",  email);
-		} catch (JSONException e1 ) {
-			e1.printStackTrace();
-		}
+		
 		try {
 			// need to send json object "user" to server  
 			HttpParams httpParams = new BasicHttpParams();
@@ -142,9 +138,15 @@ public class RegisterNewUserActivity extends Activity {
 	        HttpConnectionParams.setSoTimeout(httpParams, 10000);
 			HttpClient client = new DefaultHttpClient(httpParams);
 			HttpPost request = new HttpPost("http://166.78.251.32/gnt/register_new_customer.php");
-			Log.d(TAG, "JSON Object = "+userInfo.toString());
-		        request.setHeader("json", userInfo.toString());
-		        request.getParams().setParameter("jsonpost", userInfo);
+
+		        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(3);
+			       nameValuePairs.add(new BasicNameValuePair("username", un));
+			       nameValuePairs.add(new BasicNameValuePair("password", pw));
+			       nameValuePairs.add(new BasicNameValuePair("firstName", fn));
+			       nameValuePairs.add(new BasicNameValuePair("lastName", ln));
+			       nameValuePairs.add(new BasicNameValuePair("email", email));
+			       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		        
 		        HttpResponse response = client.execute(request);
 		        HttpEntity entity = response.getEntity();
 		        if (entity != null) {

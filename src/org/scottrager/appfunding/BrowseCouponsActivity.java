@@ -40,8 +40,10 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
@@ -69,6 +71,11 @@ public class BrowseCouponsActivity extends FragmentActivity {
     public static boolean CREATE_FILES_MANUALLY = false;
 	private static final String PREFS_FILE = "GiveAndTakePrefs";
     public String[] myFiles;
+    private ArrayList<String> navigationOptions;
+    private ArrayList<String> categories;
+    private DrawerLayout mDrawerLayout;
+    private ListView mDrawerList;
+    private ListView categoriesDrawerList;
 
     private ArrayList<CouponObject> coupons;
     private ArrayList<CouponObject> usedCoupons;
@@ -84,6 +91,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	// if true, button to right of search bar executes search, otherwise, it clears the search
 	//   button text(background) will be set to proper value
 	private boolean executeSearch;
+	private String filterCompany;
     
     private static SortByValueEnum sortByValue = SortByValueEnum.SORT_BY_NEAREST;
 	
@@ -124,6 +132,41 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.browse_coupons_w_sidebars);
+		
+		navigationOptions = new ArrayList<String>();
+		navigationOptions.add("Options:");
+		navigationOptions.add("Get New Coupons");
+		navigationOptions.add("Share on FB");
+		navigationOptions.add("Settings");
+		navigationOptions.add("G and T Info");
+		navigationOptions.add("Logout");
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.browse_coupons_w_sidebars);
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        
+        categories = new ArrayList<String>();
+        categories.add("Categories:");
+        categories.add("All");
+        categories.add("Restaurants");
+        categories.add("Entertainment");
+        categories.add("Shopping");
+        categories.add("Health");
+        categories.add("Services");
+        categories.add("Recreation");
+        categoriesDrawerList = (ListView) findViewById(R.id.right_drawer);        
+
+        // Set the adapter for the list view
+		NavDrawerArrayAdapter adapter = new NavDrawerArrayAdapter(this, navigationOptions);
+        mDrawerList.setAdapter(adapter);
+//        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+//                R.layout.options_row, navigationOptions));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new NavDrawerItemClickListener());
+
+        // Set the adapter for the list view
+		CatDrawerArrayAdapter adapter2 = new CatDrawerArrayAdapter(this, categories);
+        categoriesDrawerList.setAdapter(adapter2);
+        // Set the list's click listener
+        categoriesDrawerList.setOnItemClickListener(new CatDrawerItemClickListener());
 
 		coupons = new ArrayList<CouponObject>();
 		usedCoupons = new ArrayList<CouponObject>();
@@ -134,7 +177,24 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		endOffset = 100;
 		expanded = false;
 
-		executeSearch = true;
+		executeSearch = true;		   
+		
+		// if a bundle is passed in, then this activity was launched by mapActivity infoWindo click
+		//   so we need to start with coupons filtered
+		Intent intent = getIntent();
+		Bundle b = intent.getExtras();
+		if( b != null )
+		{
+			filterCompany = b.getString("companyName");
+			executeSearch = false;
+
+			// change execute search button to clear
+			EditText searchBox = (EditText) findViewById(R.id.coupon_search_text_box);
+			searchBox.setText(filterCompany);
+			Button searchButton = (Button)findViewById(R.id.exec_coup_search_button);
+			searchButton.setText("Clear");
+			executeSearch = false;
+		}
 	}
 	@Override
 	public void onStart() {
@@ -146,6 +206,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	}
 	@Override
 	public void onStop() {
+		Log.d(TAG, "in onStop of BrowseCouponsActivity");
 		super.onStop();
 		unbindService(mConnection);
 	}
@@ -184,20 +245,76 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		refreshActivity();
 	}
 	
+	private class NavDrawerItemClickListener implements ListView.OnItemClickListener {
+	    @Override
+	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	    	Log.d(TAG, "Clicked on item number "+position+" in the navigation drawer");
+	    	Log.d(TAG, "Text on item = "+navigationOptions.get(position).toString());
+	        //selectItem(position);
+	    	switch (position)
+	    	{
+	    		case 0:
+	    			break;
+	    		case 1:
+	    			break;
+	    		case 2:
+					Log.d(BrowseCouponsActivity.TAG, "Should go to search coupons activity.");				
+					onGetNewCouponsButtonClicked();
+	    			break;
+	    		case 3:
+	    			break;
+	    		case 4:
+	    			break;
+	    		case 5:
+	    			break;
+	    		default:
+	    			Log.d(BrowseCouponsActivity.TAG, "Error: navigation drawer item listener hit default case");
+			}
+	    }
+	}
+	
+	private class CatDrawerItemClickListener implements ListView.OnItemClickListener {
+	    @Override
+	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	    	Log.d(TAG, "Clicked on item number "+position+" in the navigation drawer");
+			Log.d(BrowseCouponsActivity.TAG, "Should filter to: "+categories.get(position).toString()+".");
+	        //selectItem(position);
+	    	switch (position)
+	    	{
+	    		case 0:
+	    			break;
+	    		case 1:
+	    			break;
+	    		case 2:
+	    			break;
+	    		case 3:
+	    			break;
+	    		case 4:
+	    			break;
+	    		case 5:
+	    			break;
+	    		default:
+	    			Log.d(BrowseCouponsActivity.TAG, "Error: navigation drawer item listener hit default case");
+			}
+	    }
+	}
+	
 	private void refreshActivity() {
 		
 		TryToGetLocation();
 		
-		refreshCouponListFromDB();
-
-		Button getNewCoupsButton = (Button) findViewById(R.id.getNewCouponsButton);
-		getNewCoupsButton.setOnClickListener( new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Log.d(BrowseCouponsActivity.TAG, "Should go to search coupons activity.");				
-				onGetNewCouponsButtonClicked();
+		if( !executeSearch && filterCompany != null )
+		{
+			if( !refreshCouponListFromDBFilteredByCompany(filterCompany) )
+			{
+				// TODO: report a toast error - none found?
+				refreshCouponListFromDB();
 			}
-		});
+		}
+		else
+		{
+			refreshCouponListFromDB();
+		}
 		
 		if( useLocations )
 		{
@@ -339,7 +456,9 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		}
 		db.close();		
 	}
-	public void refreshCouponListFromDBFilteredByCompany( String CompanyName ) {
+
+	// returns true if successful...returns false if unable to find company that it should be filtering by
+	public boolean refreshCouponListFromDBFilteredByCompany( String CompanyName ) {
 		Log.d(TAG, "in refreshCouponListFromDB()");
 		TryToGetLocation();
 		db.open();
@@ -405,8 +524,10 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		else
 		{
 			Log.d(BrowseCouponsActivity.TAG, "No coupons in database.");
+			return false;
 		}
 		db.close();	
+		return true;
 	}
 	
 	public void drawCouponList() {
@@ -516,7 +637,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		if( !useLocations )
 		{
 			displayCannotFindLocToast();
-			sortByEndingSoon( view );
+			sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button) );
 			return;
 		}
 		view.setSelected(true);
@@ -610,67 +731,18 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	@SuppressWarnings("deprecation")
 	public void onLaunchSidebarButtonClick( View view ) {
 		Log.d(SIDEBAR_ANIM_TAG, "in onLaunchSidebarButtonClick");
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		int width;
-		if( android.os.Build.VERSION.SDK_INT > 12 )
-		{
-			display.getSize(size);
-			width = size.x;
-		}
-		else
-		{
-			width = display.getWidth();
-		}
-		Log.d(SIDEBAR_ANIM_TAG, "width = "+width);
-		LinearLayout optionsSidebarView = (LinearLayout)findViewById(R.id.options_sidebar);
-		if( optionsSidebarView == null )
-		{
-			Log.d(SIDEBAR_ANIM_TAG, "null value for optionsSidebarView");
-			return;
-		}
-		ScrollView mainView = (ScrollView)findViewById(R.id.browse_coupons_mainpage);
-		//RelativeLayout mainView = (RelativeLayout)findViewById(R.id.browse_coupons_mainpage);
-		if( mainView == null )
-		{
-			Log.d(SIDEBAR_ANIM_TAG, "null value for mainView");
-			return;
-		}
-		Log.d(SIDEBAR_ANIM_TAG, "got layouts");
-		
-		if(optionsSidebarView.getVisibility() == View.INVISIBLE) { 
-			Log.d(SIDEBAR_ANIM_TAG, "trying to make sidebar visible and scroll main view");
-		    optionsSidebarView.setVisibility(View.VISIBLE);
-		    // this is set to 260 because that is the width of the sidebar layout
-		    //    defined in options_sidebar_layout.xml
-		    int xPos = optionsSidebarView.getRight();
-		    mainView.scrollTo(-(xPos), 0);
-		    //mainView.smoothScrollTo(-xPos, 0);
-		    expanded = true;
-		}
-		else
-		{
-			Log.d(SIDEBAR_ANIM_TAG, "trying to make sidebar invisible again and scroll main view back");
-			mainView.scrollTo(0,0);
-//			mainView.smoothScrollTo(0,0);
-			optionsSidebarView.setVisibility(View.INVISIBLE);
-			expanded = false;
-		}
-	}
-
-	protected void applyTransformation(float interpolatedTime, Transformation t) {
-		Log.d(SIDEBAR_ANIM_TAG, "in applyTransformation");
-	    int newOffset;
-	    if(expanded) {
-	        newOffset = 0;
-	        newOffset = (int)(endOffset*(1-interpolatedTime));
-	    } else {
-	        newOffset = (int)(endOffset*(interpolatedTime));
-	    }
-//	    view.scrollTo(-newOffset, 0);
-	    Log.d( TAG, "newOffset = " + newOffset );
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.browse_coupons_w_sidebars);
+        mDrawerLayout.openDrawer(R.id.left_drawer);
 	}
 	
+
+	public void onLaunchCategoriesClick( View view ) {
+		Log.d(SIDEBAR_ANIM_TAG, "in onLaunchCategoriesClick");
+		mDrawerLayout = (DrawerLayout) findViewById(R.id.browse_coupons_w_sidebars);
+        //mDrawerLayout.openDrawer(R.id.right_drawer);
+		mDrawerLayout.openDrawer(Gravity.RIGHT);
+	}
+
 	public void onClickMoreInfo( View view ) {
     	Uri gntPage = Uri.parse("http://www.mygiveandtake.com/");
     	Intent intent = new Intent( Intent.ACTION_VIEW, gntPage );

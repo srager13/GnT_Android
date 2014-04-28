@@ -26,7 +26,8 @@
     <string name="ending_soon_string">Ending Soon</string>
     <string name="default_coupon_book_value">Great Value!</string>
     <string name="title_activity_browse_coupons">Browse Coupons</string>
-    <string name="use_coupon_message">Use Coupon Now?</string>
+    <string name="use_coupon_title">Use Coupon Now?</string>
+    <string name="coupon_use_confirm_message">You must be at the retailer to show coupon.\n Once used, coupon will disappear.</string>
     <string name="no_coupons_message">You don\'t have any coupons!</string>
     <string name="get_new_coupons_string">Get New Coupons</string>
     <string name="fundraise_with_us_string">Fundraise with Us</string>
@@ -40,10 +41,12 @@
     <string name="title_activity_splash_screen">SplashScreenActivity</string>
     <string name="title_activity_choose_coupon_book">Choose Coupon Book</string>
     <string name="title_activity_coupon_book_array_adapter">CouponBookArrayAdapter</string>
+    <string name="cash_code_title_string">Please enter cash code provided to you by seller:</string>
     <string name="seller_code_title_string">Thank you for helping!  Please enter seller\'s ID code:</string>
     <string name="enter_seller_code_hint">Ex: ABC123</string>
     <string name="no_seller_code_string">No Specific Seller</string>
     <string name="title_activity_enter_seller_id_dialog">Enter Seller ID Code</string>
+    <string name="title_activity_enter_cash_code_dialog">Enter Cash Code</string>
     <string name="title_activity_choose_payment_option">Choose Payment Option</string>
     <string name="choose_payment_option_string">Choose Payment Option</string>
     <string name="choose_in_app_pay_string">Google Play</string>
@@ -69,5 +72,6 @@
     <string name="last_name_string">Last Name</string>
     <string name="confirm_pw_string">Confirm Password:</string>
     <string name="title_activity_company_info_more_offers">CompanyInfoMoreOffersActivity</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
