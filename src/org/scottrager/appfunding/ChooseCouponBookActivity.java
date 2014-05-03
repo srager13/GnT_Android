@@ -134,7 +134,6 @@ public class ChooseCouponBookActivity extends FragmentActivity {
 		intent.putExtra("couponBookId", coupon_book_id);
 		intent.putExtra("couponBookCost", couponBookPrices.get(position));
 		
-		// TODO:: start activity for result and finish this activity if sale completes?
 		startActivityForResult(intent, BOOK_PURCHASED);
 
 		return;
@@ -158,6 +157,7 @@ public class ChooseCouponBookActivity extends FragmentActivity {
 		intent.putExtra("couponBookId", coupon_book_id);
 		Log.d(TAG, "trying to preview book "+coupon_book_id);
 		intent.putExtra("couponBookValue", couponBookValues.get(position));
+		intent.putExtra("couponBookCost", couponBookPrices.get(position));
 		startActivityForResult(intent, BOOK_PURCHASED);
 	}
 	

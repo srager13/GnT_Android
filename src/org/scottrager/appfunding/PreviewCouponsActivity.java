@@ -3,12 +3,16 @@ package org.scottrager.appfunding;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -20,6 +24,7 @@ import org.json.JSONObject;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -29,6 +34,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -54,11 +60,13 @@ public class PreviewCouponsActivity extends FragmentActivity {
 	public static final String KEY_FAVORITE = "favorite";
     public static boolean CREATE_FILES_MANUALLY = false;
     public String[] myFiles;
+	static final int BOOK_PURCHASED = 1;
 
     private ArrayList<CouponObject> coupons;
 
 	private int coupon_book_id = -1;
 	private int coupon_book_value = 0;
+	private int coupon_book_cost = 0;
 	
 	ProgressDialog dialog;
 
@@ -76,6 +84,7 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		{
 			coupon_book_id = b.getInt("couponBookId");
 			coupon_book_value = b.getInt("couponBookValue");
+			coupon_book_cost = b.getInt("couponBookCost");
 			Log.d(TAG, "should get coupons for coupon book "+coupon_book_id);
 			
 			if( IsConnected() )
@@ -114,7 +123,8 @@ public class PreviewCouponsActivity extends FragmentActivity {
 	public void onResume() {
 		super.onResume();
 		Log.d(TAG, "in onResume()");
-
+		
+		this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 	}
 	
 	
@@ -164,23 +174,21 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		return;
 	}
 	
-	
-	/*
-	public void onActivityResult( int requestCode, int resultCode, Intent data ) 
-	{
-		Log.d(PreviewCouponsActivity.TAG, "Entered OnActivityResult()");
-		//super.onActivityResult( requestCode,  resultCode,  data );
-		if( requestCode == use_coup_request_Code )
-		{
-			if( resultCode == RESULT_OK )
-			{
-				int pos = data.getIntExtra("position", 0);
-				Log.d(PreviewCouponsActivity.TAG, "OnActivityResult()...position = "+pos);
-				//useCouponConfirmed( pos );
-			}
-		}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	Log.d(TAG, "In onActivityResult() of PreviewCouponsActivity.");
+	    // Check which request we're responding to
+	    if (requestCode == BOOK_PURCHASED) {
+	        // Make sure the request was successful
+	        if (resultCode == RESULT_OK) {
+	        	// user bought a coupon book, so we can kill this activity
+	        	Log.d(TAG, "\t book was purchased, so finishing");
+	        	this.setResult(RESULT_OK);
+	        	finish();
+	        }
+	    }
 	}
-*/	
 
 	public void sortByNearest( View view ) {
 		view.setSelected(true);
@@ -226,9 +234,10 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		Intent intent = new Intent( this, EnterSellerIdDialog.class );
 		intent.putExtra("couponBookId", coupon_book_id);
 		intent.putExtra("coupondBookValue", coupon_book_value);
+		intent.putExtra("couponBookCost", coupon_book_cost);
 		
 		// TODO:: start activity for result and finish this activity if sale completes?
-		startActivity(intent);
+		startActivityForResult(intent, BOOK_PURCHASED);
 
 		return;
 		
@@ -252,6 +261,10 @@ public class PreviewCouponsActivity extends FragmentActivity {
 			e1.printStackTrace();
 		}
 		
+
+		SharedPreferences prefs = getSharedPreferences( MainActivity.PREFS_FILE, 0);
+		String username = prefs.getString(MainActivity.USERNAME, "");
+		
 		try {
 		// need to send json object "user" to server  
 		HttpParams httpParams = new BasicHttpParams();
@@ -260,9 +273,12 @@ public class PreviewCouponsActivity extends FragmentActivity {
         HttpConnectionParams.setSoTimeout(httpParams, 10000);
 		HttpClient client = new DefaultHttpClient(httpParams);
 		HttpPost request = new HttpPost("http://166.78.251.32/gnt/get_coupons_for_book_to_preview.php");
-	        request.setHeader("json", info.toString());
-	        //Log.d(TAG, "JSON Object = "+info.toString());
-	        request.getParams().setParameter("jsonpost", info);
+		   
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+	    nameValuePairs.add(new BasicNameValuePair("couponBookId", String.valueOf(coupon_book_id)));
+	    nameValuePairs.add(new BasicNameValuePair("username", username));
+	    request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+	        
 	        HttpResponse response = client.execute(request);
 	        HttpEntity entity = response.getEntity();
 	        if (entity != null) {
