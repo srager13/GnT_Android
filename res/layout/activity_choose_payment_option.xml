@@ -31,14 +31,6 @@
 			android:background="@drawable/credit_card_button"
 		    android:onClick="onChooseCreditCardPay" />
 		<Button
-			android:id="@+id/choose_in_app_pay_button"
-			style="@style/HomeScreenButtons"
-			android:layout_width="213dp"
-			android:layout_height="54dp"
-			android:layout_marginTop="20dp"
-			android:text="PayPal"
-			android:onClick="onChooseInAppPay" />
-		<Button
 		    android:id="@+id/choose_cash_pay_button"
 		    style="@style/HomeScreenButtons"
 			android:layout_width="213dp"

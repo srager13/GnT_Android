@@ -72,6 +72,16 @@
     <string name="last_name_string">Last Name</string>
     <string name="confirm_pw_string">Confirm Password:</string>
     <string name="title_activity_company_info_more_offers">CompanyInfoMoreOffersActivity</string>
+    <string name="title_activity_enter_credit_card_info_dialog">Pay With Credit Card</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="credit_card_info_title_string">Thank you for helping!  Please enter your credit card information:</string>
+    <string name="credit_card_number_prompt">Credit Card Number:</string>
+    <string name="credit_card_CVC_prompt">CVC Code:</string>
+    <string name="credit_card_exp_date_month_prompt">Exp. Date Month:</string>
+    <string name="credit_card_exp_date_year_prompt">Exp. Date Year:</string>
+    <string name="credit_card_number_hint">No Spaces</string>
+    <string name="credit_card_CVC_hint">3 or 4 digits</string>
+    <string name="credit_card_exp_date_month_hint">2 digit month</string>
+    <string name="credit_card_exp_date_year_hint">4 digit year</string>
 
 </resources>

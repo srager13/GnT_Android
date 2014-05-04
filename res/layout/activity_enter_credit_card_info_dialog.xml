@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@color/blue"
+    android:orientation="vertical" >
+    
+    <TextView 
+        android:id="@+id/credit_card_info_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/credit_card_info_title_string"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        android:layout_marginBottom="15dp" />
+    
+    
+    <TextView 
+        android:id="@+id/credit_card_number_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/credit_card_number_prompt"
+        android:textSize="15sp"
+        android:textColor="@color/white" />
+    
+    <EditText
+        android:id="@+id/credit_card_number_input_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="@string/credit_card_number_hint" />
+    
+    <TextView 
+        android:id="@+id/credit_card_CVC_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/credit_card_CVC_prompt"
+        android:textSize="15sp"
+        android:textColor="@color/white" />
+    
+    <EditText
+        android:id="@+id/credit_card_CVC_input_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="@string/credit_card_CVC_hint" />
+    
+    <TextView 
+        android:id="@+id/credit_card_exp_date_month_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/credit_card_exp_date_month_prompt"
+        android:textSize="15sp"
+        android:textColor="@color/white" />
+    
+    <EditText
+        android:id="@+id/credit_card_exp_date_month_input_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="@string/credit_card_exp_date_month_hint" />
+    
+    <TextView 
+        android:id="@+id/credit_card_exp_date_year_prompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/credit_card_exp_date_year_prompt"
+        android:textSize="15sp"
+        android:textColor="@color/white" />
+    
+    <EditText
+        android:id="@+id/credit_card_exp_date_year_input_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="number"
+        android:hint="@string/credit_card_exp_date_year_hint" />
+	
+	    <Button
+	        android:id="@+id/submit_button"
+	        style="@style/HomeScreenButtons"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="30dp"
+	        android:layout_marginRight="30dp"
+			android:layout_gravity="center"
+			android:layout_marginBottom="20dp"
+	        android:text="@string/submit_string"
+	        android:onClick="onSubmit" />
+	    <Button
+	        android:id="@+id/cancel_button"
+	        style="@style/HomeScreenButtons"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_marginLeft="30dp"
+	        android:layout_marginRight="30dp"
+			android:layout_gravity="center"
+			android:layout_marginTop="20dp"
+	        android:text="@string/cancel_string"
+	        android:onClick="onCancel" />
+        
+</LinearLayout>

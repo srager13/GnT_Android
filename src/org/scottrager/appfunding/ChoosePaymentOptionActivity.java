@@ -45,6 +45,7 @@ public class ChoosePaymentOptionActivity extends Activity {
 	private String seller_id;
 	
 	static final int VALID_CASH_CODE = 1;
+	static final int VALID_CREDIT_CARD = 1;
 	
 	ProgressDialog dialog;
 	
@@ -70,18 +71,6 @@ public class ChoosePaymentOptionActivity extends Activity {
 		return true;
 	}
 	
-	public void onChooseInAppPay( View view ) {
-		Log.d(TAG, "chose to pay in app (through Google Play market)");
-		
-		if( !IsConnected() )
-		{
-			DisplayNoConnectionToast();
-			return;
-		}
-
-		// TODO:: Need to verify payment
-		new addCoupons().execute();
-	}
 	
 	public void onChooseCreditCardPay( View view ) {
 		Log.d(TAG, "chose to pay with credit card");
@@ -91,8 +80,12 @@ public class ChoosePaymentOptionActivity extends Activity {
 			DisplayNoConnectionToast();
 			return;
 		}
-		// TODO:: Need to verify payment
-		new addCoupons().execute();
+
+		Intent intent = new Intent( this, EnterCreditCardInfoDialog.class );
+		intent.putExtra("couponBookCost", coupon_book_cost);
+		intent.putExtra("sellerId", seller_id);
+
+		startActivityForResult(intent, VALID_CREDIT_CARD);
 	}
 	
 	public void onChooseCashPay( View view ) {
@@ -116,7 +109,7 @@ public class ChoosePaymentOptionActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 	    // Check which request we're responding to
-	    if (requestCode == VALID_CASH_CODE) {
+	    if (requestCode == VALID_CASH_CODE || requestCode == VALID_CREDIT_CARD) {
 	        // Make sure the request was successful
 	        if (resultCode == RESULT_OK) {
 	            // The user entered a valid cash code
