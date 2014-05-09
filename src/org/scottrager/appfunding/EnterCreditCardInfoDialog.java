@@ -32,7 +32,9 @@ import android.widget.Toast;
 
 import com.stripe.android.*;
 import com.stripe.android.model.Card;
+import com.stripe.android.model.Token;
 import com.stripe.exception.AuthenticationException;
+
 
 public class EnterCreditCardInfoDialog extends Activity {
 
@@ -71,12 +73,17 @@ public class EnterCreditCardInfoDialog extends Activity {
 //	}
 	
 	public void onSubmit( View view ) {
+		//TODO:  Check these inputs
 		Log.d(TAG, "Pushed submit button.");
 		EditText cc_num_box = (EditText)findViewById(R.id.credit_card_number_input_box);
-		credit_card_number = new String(cc_num_box.getText().toString());
+		credit_card_number = cc_num_box.getText().toString();
+		
+		Log.d(TAG, "Credit Card Number = "+credit_card_number);
 		
 		EditText cvc_box = (EditText)findViewById(R.id.credit_card_CVC_input_box);
-		CVC_code = new String(cvc_box.getText().toString());
+		CVC_code = cvc_box.getText().toString();
+		
+		Log.d(TAG, "CVC Code = "+CVC_code);
 
 		EditText exp_date_month_box = (EditText)findViewById(R.id.credit_card_exp_date_month_input_box);
 		exp_date_month = Integer.parseInt(exp_date_month_box.getText().toString());
@@ -84,6 +91,9 @@ public class EnterCreditCardInfoDialog extends Activity {
 		EditText exp_date_year_box = (EditText)findViewById(R.id.credit_card_exp_date_year_input_box);
 		exp_date_year = Integer.parseInt(exp_date_year_box.getText().toString());
 		
+		Log.d(TAG, "Exp Date: "+exp_date_month+"/"+exp_date_year);
+		
+		// public Card(String number, Integer expMonth, Integer expYear, String cvc) {
 		Card card = new Card( credit_card_number, exp_date_month, exp_date_year, CVC_code );
 		
 		if( !card.validateCard() )
@@ -98,11 +108,10 @@ public class EnterCreditCardInfoDialog extends Activity {
 			stripe.createToken(
 				    card,
 				    new TokenCallback() {
-						@Override
 						public void onSuccess(
-								com.stripe.android.model.Token token) {
+								Token token) {
 							// Send token to server
-							
+							Log.d(TAG, "Token: "+token.toString());
 							new chargeCustomer().execute(token.toString(), String.valueOf(coupon_book_cost));
 						}
 				        public void onError(Exception error) {
@@ -176,7 +185,7 @@ public class EnterCreditCardInfoDialog extends Activity {
 	            int current = 0;
 	            while( (current = in.read()) != -1 ) {
 	            	baf.append((byte) current);
-	            	//Log.d(TAG, "byte = "+current);
+	            	Log.d(TAG, "byte = "+(char)current);
 	            }
 	            in.close();
 	            Log.d(TAG, "BAF: "+baf.toString());

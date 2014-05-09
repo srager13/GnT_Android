@@ -70,11 +70,7 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 		markers = new ArrayList<MarkerObject>();
 		markerMap = new HashMap<String, Integer>();
 		 
-		try {
-		     MapsInitializer.initialize(this);
-		 } catch (GooglePlayServicesNotAvailableException e) {
-		     e.printStackTrace();
-		 }
+		MapsInitializer.initialize(this);
 	}
 	
 	@Override
