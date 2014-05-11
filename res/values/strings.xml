@@ -63,6 +63,7 @@
     <string name="title_activity_login">Login</string>
     <string name="username">Username:</string>
     <string name="password">Password:</string>
+    <string name="keep_logged">Keep Me Logged In</string>
     <string name="login_string">Login</string>
     <string name="register_string">Register New User</string>
     <string name="title_activity_register_new_user">RegisterNewUserActivity</string>

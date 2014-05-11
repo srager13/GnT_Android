@@ -43,12 +43,23 @@
         android:layout_below="@id/passwordText"
         android:layout_marginLeft="40dp"
         android:layout_marginRight="40dp"
-        android:layout_marginBottom="20dp"
         android:inputType="textPassword" />
     
+    <CheckBox 
+        android:id="@+id/remember_me_checkbox"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleX="0.70"
+        android:scaleY="0.70"
+		android:layout_below="@id/PasswordBox"
+		android:layout_marginLeft="40dp"
+		android:text="@string/keep_logged"
+		android:checked="true"
+        />
+        
 	<Button
         android:id="@+id/submit_button"
-		android:layout_below="@id/PasswordBox"
+		android:layout_below="@id/remember_me_checkbox"
 		android:layout_width="213dp"
 	    android:layout_height="54dp"
 	    android:layout_centerHorizontal="true"

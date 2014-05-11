@@ -3,7 +3,9 @@ package org.scottrager.appfunding;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -96,6 +98,8 @@ public class EnterCreditCardInfoDialog extends Activity {
 		// public Card(String number, Integer expMonth, Integer expYear, String cvc) {
 		Card card = new Card( credit_card_number, exp_date_month, exp_date_year, CVC_code );
 		
+		Log.d(TAG, "Card: "+card.toString());
+		
 		if( !card.validateCard() )
 		{
 			Toast.makeText(getApplicationContext(), "Error in Credit Card Information.\nPlease check and try again.", Toast.LENGTH_LONG).show();
@@ -111,8 +115,8 @@ public class EnterCreditCardInfoDialog extends Activity {
 						public void onSuccess(
 								Token token) {
 							// Send token to server
-							Log.d(TAG, "Token: "+token.toString());
-							new chargeCustomer().execute(token.toString(), String.valueOf(coupon_book_cost));
+							Log.d(TAG, "TokenCallback() onSuccess()");
+							new chargeCustomer().execute(token.getId(), String.valueOf(coupon_book_cost));
 						}
 				        public void onError(Exception error) {
 				            // Show localized error message
@@ -129,6 +133,7 @@ public class EnterCreditCardInfoDialog extends Activity {
 		
 		
 	}
+	
 	
 	public void onCancel( View view ) {
 		finish();
@@ -159,7 +164,7 @@ public class EnterCreditCardInfoDialog extends Activity {
         HttpConnectionParams.setSoTimeout(httpParams, 10000);
 		HttpClient client = new DefaultHttpClient(httpParams);
 		HttpPost request = new HttpPost("http://166.78.251.32/gnt/charge_customer.php");
-		   List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+		   List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
 	       nameValuePairs.add(new BasicNameValuePair("stripeToken", token));
 	       nameValuePairs.add(new BasicNameValuePair("couponBookCost", coupon_book_cost));
 	       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
@@ -188,12 +193,12 @@ public class EnterCreditCardInfoDialog extends Activity {
 	            	Log.d(TAG, "byte = "+(char)current);
 	            }
 	            in.close();
-	            Log.d(TAG, "BAF: "+baf.toString());
+	            //Log.d(TAG, "BAF: "+baf.toString());
 	            JSONObject json = new JSONObject(new String(baf.toByteArray(), "utf-8"));
 
 	            if( !json.getString("error").equals("none") )
 	            {
-	            	Log.d(TAG, "Credit card declined.");    		
+	            	Log.d(TAG, "Error = "+json.getString("error"));    		
 	            	return false;
 	            }
 	        }

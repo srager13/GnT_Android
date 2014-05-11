@@ -33,6 +33,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -41,9 +42,6 @@ public class RegisterNewUserActivity extends Activity {
 	private static final String ERROR = "error";
 	public static final String TAG = "registernewuser";
 	private static final String PREFS_FILE = "GiveAndTakePrefs";
-	private static final String HAS_ACCOUNT = "HasAccount";
-	private static final String USERNAME = "Username";
-	private static final String PASSWORD_HASH = "PasswordHash";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +92,12 @@ public class RegisterNewUserActivity extends Activity {
     	}
     	else
     	{
-    		new RegisterNewUser(username, password, firstname, lastname, email).execute();
+    		boolean stayLogged = false;
+    		final CheckBox checkBox = (CheckBox) findViewById(R.id.StayLoggedCheckbox);
+            if (checkBox.isChecked()) {
+                stayLogged = true;
+            }
+    		new RegisterNewUser(username, password, firstname, lastname, email, stayLogged).execute();
     	}
 	}
 
@@ -115,8 +118,9 @@ public class RegisterNewUserActivity extends Activity {
     	String fn;
     	String ln;
     	String email;
+    	boolean stayLogged;
     	
-    	public RegisterNewUser( String un, String pw, String fn, String ln, String email )
+    	public RegisterNewUser( String un, String pw, String fn, String ln, String email, boolean sL )
     	{
     		super();
     		this.un = new String(un);
@@ -124,6 +128,7 @@ public class RegisterNewUserActivity extends Activity {
     		this.fn = new String(fn);
     		this.ln = new String(ln);
     		this.email = new String(email);
+    		stayLogged = sL;
     	}
     	@Override
     	protected Long doInBackground(URL... params) {
@@ -209,6 +214,7 @@ public class RegisterNewUserActivity extends Activity {
     			editor.putString( LoginActivity.USERNAME, ((EditText)findViewById(R.id.UserNameBox)).getText().toString() );
     			editor.putString( LoginActivity.PASSWORD_HASH, ((EditText)findViewById(R.id.PasswordBox)).getText().toString() );
     			editor.putBoolean(LoginActivity.LOGGED_IN, true);
+    			editor.putBoolean(LoginActivity.STAY_LOGGED, stayLogged);
     			editor.commit();
     			
     			// launch into main activity and finish this one

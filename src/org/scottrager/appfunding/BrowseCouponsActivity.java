@@ -4,7 +4,9 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -20,7 +22,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.scottrager.appfunding.LocationService.LocationServiceBinder;
 
-import android.annotation.SuppressLint;
+import com.flurry.android.FlurryAgent;
+
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,7 +34,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.graphics.Point;
 import android.location.Location;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -42,22 +44,17 @@ import android.os.IBinder;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
-import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,8 +95,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	private DBAdapter db;
 	private int use_coup_request_Code = 1;
 	
-	private int endOffset;
-	private boolean expanded;
 	private boolean mBound = false;
 	
 	private ServiceConnection mConnection = new ServiceConnection() {
@@ -174,9 +169,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		
 		db = new DBAdapter(this);
 		
-		endOffset = 100;
-		expanded = false;
-
 		executeSearch = true;		   
 		
 		// if a bundle is passed in, then this activity was launched by mapActivity infoWindo click
@@ -203,17 +195,33 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		
 		Intent locService = new Intent(this, LocationService.class);
 		bindService(locService, mConnection, Context.BIND_AUTO_CREATE);
+		
+		FlurryAgent.onStartSession(this, "J9WHX3VYHPRX8K756WTJ");
 	}
 	@Override
 	public void onStop() {
 		Log.d(TAG, "in onStop of BrowseCouponsActivity");
 		super.onStop();
 		unbindService(mConnection);
+		
+		FlurryAgent.onEndSession(this);
 	}
 	
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		
+		// if user does not want to stay logged in, forget login in and pw
+		SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
+		SharedPreferences.Editor editor = prefs.edit();
+		
+		if( !prefs.getBoolean(LoginActivity.STAY_LOGGED, false) )
+    	{
+			editor.putString( LoginActivity.USERNAME, "" );
+			editor.putString( LoginActivity.PASSWORD_HASH, "");
+			editor.putBoolean(LoginActivity.LOGGED_IN, false);
+			editor.commit();
+    	}
 	}
 
 	@Override
@@ -247,7 +255,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	
 	private class NavDrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
-	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 	    	Log.d(TAG, "Clicked on item number "+position+" in the navigation drawer");
 	    	Log.d(TAG, "Text on item = "+navigationOptions.get(position).toString());
 	        //selectItem(position);
@@ -275,7 +283,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	
 	private class CatDrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
-	    public void onItemClick(AdapterView parent, View view, int position, long id) {
+	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 	    	Log.d(TAG, "Clicked on item number "+position+" in the navigation drawer");
 			Log.d(BrowseCouponsActivity.TAG, "Should filter to: "+categories.get(position).toString()+".");
 	        //selectItem(position);
@@ -598,6 +606,13 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		        b.putString("couponDetail", couponDetail);
 		        b.putBoolean("usable", true);
 		        coupDisplayIntent.putExtras(b);
+		        
+		        // Capture author info & user status
+		        Map<String, String> couponParams = new HashMap<String, String>();
+		 
+		        couponParams.put("companyName", companyName); 
+		        couponParams.put("couponDetail", couponDetail); 
+		        FlurryAgent.logEvent("couponViewed", couponParams);
 
 		        startActivityForResult( coupDisplayIntent, use_coup_request_Code );
 		    }
@@ -727,12 +742,10 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		Toast.makeText(getApplicationContext(), "Cannot find current location.", Toast.LENGTH_LONG).show();
 	}
 	
-	@SuppressLint("NewApi")
-	@SuppressWarnings("deprecation")
 	public void onLaunchSidebarButtonClick( View view ) {
 		Log.d(SIDEBAR_ANIM_TAG, "in onLaunchSidebarButtonClick");
         mDrawerLayout = (DrawerLayout) findViewById(R.id.browse_coupons_w_sidebars);
-        mDrawerLayout.openDrawer(R.id.left_drawer);
+        mDrawerLayout.openDrawer(Gravity.LEFT);
 	}
 	
 
@@ -757,12 +770,13 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	
 	public void onClickLogOut( View view ) {
 
-		// store valid login in and pw
+		// forget valid login in and pw
 		SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
 		SharedPreferences.Editor editor = prefs.edit();
 		editor.putString( LoginActivity.USERNAME, "" );
 		editor.putString( LoginActivity.PASSWORD_HASH, "");
 		editor.putBoolean(LoginActivity.LOGGED_IN, false);
+		editor.putBoolean(LoginActivity.STAY_LOGGED, false);
 		editor.commit();
 		
 		Intent intent = new Intent();

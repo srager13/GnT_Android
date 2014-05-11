@@ -21,6 +21,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.flurry.android.FlurryAgent;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -62,6 +64,20 @@ public class ChoosePaymentOptionActivity extends Activity {
 		coupon_book_cost = b.getInt("couponBookCost");
 		seller_id = b.getString("sellerId");
 		db = new DBAdapter(this);
+	}
+	@Override
+	public void onStart() {
+		Log.d(TAG, "In onStart");
+		super.onStart();
+		
+		FlurryAgent.onStartSession(this, "J9WHX3VYHPRX8K756WTJ");
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+		
+		FlurryAgent.onEndSession(this);
 	}
 
 	@Override
@@ -113,7 +129,7 @@ public class ChoosePaymentOptionActivity extends Activity {
 	        // Make sure the request was successful
 	        if (resultCode == RESULT_OK) {
 	            // The user entered a valid cash code
-	    		new addCoupons().execute();	        	
+	    		new addCoupons().execute();
 	        }
 	    }
 	}
@@ -232,6 +248,7 @@ public class ChoosePaymentOptionActivity extends Activity {
 	            else
 	            {
 	            	Log.d(TAG, "JSON request returned the following error: "+json.getString("error"));
+	            	FlurryAgent.onError("JSON_Error", json.getString("error"), "Internet_Error");
 	            }
 	            //String result = EntityUtils.toString(entity);
 	            //Log.d(TAG, "Read from server:" + result);
@@ -285,22 +302,17 @@ public class ChoosePaymentOptionActivity extends Activity {
     {
     	//TODO::Need to make sure arguments are safe
 		Log.d(TAG, "Trying to get coupon with id = "+coupon_id);
-    	JSONObject info = new JSONObject();
+
 		try {
-			info.put("couponId", coupon_id);
-		} catch (JSONException e1 ) {
-			e1.printStackTrace();
-		}
-		try {
-		// need to send json object "user" to server  
 		HttpParams httpParams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpParams,
                 10000);
         HttpConnectionParams.setSoTimeout(httpParams, 10000);
 		HttpClient client = new DefaultHttpClient(httpParams);
 		HttpPost request = new HttpPost("http://166.78.251.32/gnt/get_coupon_with_id.php");
-	        request.setHeader("json", info.toString());
-	        request.getParams().setParameter("jsonpost", info);
+		   List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+	       nameValuePairs.add(new BasicNameValuePair("couponId", String.valueOf(coupon_id)));
+	       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 	        HttpResponse response = client.execute(request);
 	        HttpEntity entity = response.getEntity();
 	        if (entity != null) {
@@ -362,12 +374,7 @@ public class ChoosePaymentOptionActivity extends Activity {
     {
     	//TODO::Need to make sure arguments are safe
 		Log.d(TAG, "Trying to get company with id = "+company_id);
-    	JSONObject info = new JSONObject();
-		try {
-			info.put("companyId", company_id);
-		} catch (JSONException e1 ) {
-			e1.printStackTrace();
-		}
+
 		try {
 		// need to send json object "user" to server  
 		HttpParams httpParams = new BasicHttpParams();
@@ -376,8 +383,9 @@ public class ChoosePaymentOptionActivity extends Activity {
         HttpConnectionParams.setSoTimeout(httpParams, 10000);
 		HttpClient client = new DefaultHttpClient(httpParams);
 		HttpPost request = new HttpPost("http://166.78.251.32/gnt/get_company_with_id.php");
-	        request.setHeader("json", info.toString());
-	        request.getParams().setParameter("jsonpost", info);
+		   List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+	       nameValuePairs.add(new BasicNameValuePair("companyId", String.valueOf(company_id)));
+	       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 	        HttpResponse response = client.execute(request);
 	        HttpEntity entity = response.getEntity();
 	        if (entity != null) {
@@ -443,13 +451,7 @@ public class ChoosePaymentOptionActivity extends Activity {
     {
     	//TODO::Need to make sure arguments are safe
 		Log.d(TAG, "Trying to get location with id = "+location_id);
-    	JSONObject info = new JSONObject();
-		try {
-			info.put("locationId", location_id);
-			info.put("companyId", company_id);
-		} catch (JSONException e1 ) {
-			e1.printStackTrace();
-		}
+
 		try {
 		// need to send json object "user" to server  
 		HttpParams httpParams = new BasicHttpParams();
@@ -458,8 +460,10 @@ public class ChoosePaymentOptionActivity extends Activity {
         HttpConnectionParams.setSoTimeout(httpParams, 10000);
 		HttpClient client = new DefaultHttpClient(httpParams);
 		HttpPost request = new HttpPost("http://166.78.251.32/gnt/get_location_with_id.php");
-	        request.setHeader("json", info.toString());
-	        request.getParams().setParameter("jsonpost", info);
+		   List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
+	       nameValuePairs.add(new BasicNameValuePair("companyId", String.valueOf(company_id)));
+	       nameValuePairs.add(new BasicNameValuePair("locationId", String.valueOf(location_id)));
+	       request.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 	        HttpResponse response = client.execute(request);
 	        HttpEntity entity = response.getEntity();
 	        if (entity != null) {

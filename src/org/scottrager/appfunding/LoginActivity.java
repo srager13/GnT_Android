@@ -33,14 +33,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
 public class LoginActivity extends Activity {
 
-	private static final String PREFS_FILE = "GiveAndTakePrefs";
+	public static final String PREFS_FILE = "GiveAndTakePrefs";
 	public static final String HAS_ACCOUNT = "HasAccount";
 	public static final String LOGGED_IN = "LoggedIn";
+	public static final String STAY_LOGGED = "StayLogged";
 	public static final String USERNAME = "Username";
 	public static final String PASSWORD_HASH = "PasswordHash";
 	public static final String SUCCESS = "success";
@@ -68,7 +70,12 @@ public class LoginActivity extends Activity {
 		if( IsConnected() ) {
 	    	String username = ((EditText)findViewById(R.id.UserNameBox)).getText().toString();
 	    	String passwordHash = ((EditText)findViewById(R.id.PasswordBox)).getText().toString();
-		new ValidateLogin().execute(username, passwordHash);
+	    	String stayLogged = "false";
+	    	final CheckBox checkBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
+            if (checkBox.isChecked()) {
+                 stayLogged = "true";
+            }
+		new ValidateLogin().execute(username, passwordHash, stayLogged);
 		}
 		else
 		{
@@ -181,6 +188,15 @@ public class LoginActivity extends Activity {
     			editor.putString( PASSWORD_HASH, ((EditText)findViewById(R.id.PasswordBox)).getText().toString() );
     			editor.putBoolean(HAS_ACCOUNT, true);
     			editor.putBoolean(LOGGED_IN, true);
+
+    	    	final CheckBox checkBox = (CheckBox) findViewById(R.id.remember_me_checkbox);
+                if (checkBox.isChecked()) {
+        			editor.putBoolean(STAY_LOGGED, true);
+                }
+                else
+                {
+                	editor.putBoolean(STAY_LOGGED, false);
+                }
     			editor.commit();
     			
     		// launch into main activity and finish this one

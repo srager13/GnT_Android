@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.location.Location;
 import android.net.ConnectivityManager;
@@ -71,11 +72,6 @@ public class MapActivity extends FragmentActivity implements OnMarkerClickListen
 		markerMap = new HashMap<String, Integer>();
 		 
 		MapsInitializer.initialize(this);
-	}
-	
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
 	}
 
 	@Override

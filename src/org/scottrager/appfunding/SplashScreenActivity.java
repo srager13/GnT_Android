@@ -58,10 +58,6 @@ public class SplashScreenActivity extends Activity {
     	final int numCoups = prefs.getInt("numCoups", 0);
     	Log.d( TAG, "numCoups = "+numCoups);
 
-    	//TODO::This should be changed, right?
-	    editor.putBoolean("firstOpen", false);
-	    editor.commit();
-
         final SplashScreenActivity sPlashScreen = this;
         
         // The thread to wait for splash screen events
@@ -74,8 +70,7 @@ public class SplashScreenActivity extends Activity {
                         // Wait given period of time or exit on touch
                     	wait(2000);
                     	Log.d(TAG, "calling SyncData().execute()");
-                        //new SyncData().execute( "huh" );
-                    	SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
+                        SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
                 	    boolean isLoggedIn = prefs.getBoolean(LoginActivity.LOGGED_IN, false);
                 	    if( !isLoggedIn )
                 	    {
@@ -84,22 +79,15 @@ public class SplashScreenActivity extends Activity {
                     		startActivity(intent);	
                     		finish();
                     		
-                	    } // Always go to main activity (numCoups test not working for some reason
-                	    else //if( numCoups > 0 )
-                            {	
-                	    		Log.d(TAG, "Login was valid and numCoups > 0");
-                            	// Run next activity
-                            	Intent intent = new Intent();
-                            	intent.setClass(sPlashScreen, MainActivity.class);
-                            	startActivity(intent);
-                            }
-                           /* else
-                            {
-                	    		Log.d(TAG, "Login was valid and numCoups <= 0");
-                            	Intent intent = new Intent();
-                            	intent.setClass(sPlashScreen, SearchNewCouponsActivity.class);
-                            	startActivity(intent);
-                            }*/
+                	    } 
+                	    else
+                        {	
+            	    		Log.d(TAG, "Login was valid and numCoups > 0");
+                        	// Run next activity
+                        	Intent intent = new Intent();
+                        	intent.setClass(sPlashScreen, MainActivity.class);
+                        	startActivity(intent);
+                        }
 
                             finish();
                     }

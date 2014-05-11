@@ -98,7 +98,6 @@ public class PreviewCouponsActivity extends FragmentActivity {
 		}
 		
 	}
-
 	
 	private boolean IsConnected() {
 

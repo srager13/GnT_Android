@@ -4,6 +4,8 @@ import java.util.List;
 
 import org.scottrager.appfunding.LocationService.LocationServiceBinder;
 
+import com.flurry.android.FlurryAgent;
+
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -35,8 +37,8 @@ public class MainActivity extends Activity {
 	LocationServiceBinder binder;
 	
 	private LocationService locationService;
-	private boolean mBound = false;
 	private Location currentLocation = null;
+	private boolean mBound = false;
    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,24 +51,24 @@ public class MainActivity extends Activity {
 			Toast.makeText(getApplicationContext(), "No Network Available.", Toast.LENGTH_LONG).show();
         }
 
-    	SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
-    	boolean firstOpen = prefs.getBoolean("firstOpen", true);        
-    	//firstOpen = true;
-    	if( firstOpen )
-    	{
-		//	Toast.makeText(getApplicationContext(), "First Time Open.", Toast.LENGTH_LONG).show();
-    		Log.d(TAG, "First time opened.");
-
-		    SharedPreferences.Editor editor = prefs.edit();
-		    editor.putBoolean("firstOpen", false);
-		    editor.commit();
-    		
-    	}
-    	else
-    	{
-		//	Toast.makeText(getApplicationContext(), "Not first time opened.", Toast.LENGTH_LONG).show();
-    		Log.d(TAG, "Not first time opened.");
-    	}
+//    	SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
+//    	boolean firstOpen = prefs.getBoolean("firstOpen", true);        
+//    	//firstOpen = true;
+//    	if( firstOpen )
+//    	{
+//		//	Toast.makeText(getApplicationContext(), "First Time Open.", Toast.LENGTH_LONG).show();
+//    		Log.d(TAG, "First time opened.");
+//
+//		    SharedPreferences.Editor editor = prefs.edit();
+//		    editor.putBoolean("firstOpen", false);
+//		    editor.commit();
+//    		
+//    	}
+//    	else
+//    	{
+//		//	Toast.makeText(getApplicationContext(), "Not first time opened.", Toast.LENGTH_LONG).show();
+//    		Log.d(TAG, "Not first time opened.");
+//    	}
     	
     }
 	@Override
@@ -75,11 +77,15 @@ public class MainActivity extends Activity {
 		super.onStart();
 		Intent locService = new Intent(this, LocationService.class);
 		bindService(locService, mConnection, Context.BIND_AUTO_CREATE);
+		
+		FlurryAgent.onStartSession(this, "J9WHX3VYHPRX8K756WTJ");
 	}
 	@Override
 	public void onStop() {
 		super.onStop();
 		unbindService(mConnection);
+		
+		FlurryAgent.onEndSession(this);
 	}
     
     @Override
@@ -87,6 +93,22 @@ public class MainActivity extends Activity {
     	super.onResume();
     }
 
+    @Override
+    public void onDestroy() {
+    	super.onDestroy();
+		
+    	// if user does not want to stay logged in, forget login in and pw
+		SharedPreferences prefs = getSharedPreferences( PREFS_FILE, 0);
+		SharedPreferences.Editor editor = prefs.edit();
+		
+		if( !prefs.getBoolean(LoginActivity.STAY_LOGGED, false) )
+    	{
+			editor.putString( LoginActivity.USERNAME, "" );
+			editor.putString( LoginActivity.PASSWORD_HASH, "");
+			editor.putBoolean(LoginActivity.LOGGED_IN, false);
+			editor.commit();
+    	}
+    }
     
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
