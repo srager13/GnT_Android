@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/browse_coupons_w_sidebars"
@@ -7,62 +8,12 @@
     
     <!-- The main content view -->
 
-  <RelativeLayout
+  <android.support.v4.widget.ViewPager
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:id="@+id/browseCouponsPager"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/white" >
+    android:layout_height="match_parent" />
        
-    <LinearLayout
-        android:id="@+id/sort_filter_buttons"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/coupon_search_bar_and_button"
-        android:paddingTop="6dp"
-        android:paddingBottom="6dp"
-        android:background="@color/blue"
-        android:orientation="horizontal" >
-        
-        <Button
-            android:id="@+id/sort_by_nearest_button"
-            style="@style/SortCouponButtons"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="5dp"
-            android:text="@string/nearest_string"
-            android:onClick="sortByNearest" />
-        
-        <Button
-            android:id="@+id/go_to_map_button"
-            style="@style/SortCouponButtons"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="5dp"
-            android:text="@string/map_string"
-            android:onClick="goToMap" />
-        
-        <Button
-            android:id="@+id/sort_by_ending_soon_button"
-            style="@style/SortCouponButtons"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="5dp"
-            android:text="@string/ending_soon_string"
-            android:onClick="sortByEndingSoon" />
-        
-        <Button
-            android:id="@+id/sort_by_az_button"
-            style="@style/SortCouponButtons"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="fill_parent"
-            android:layout_marginLeft="5dp"
-            android:text="@string/az_string"
-            android:onClick="sortAlphabetically" />
-    </LinearLayout>
-
 	
 	<ListView
 	    android:id="@+id/couponList"
@@ -99,7 +50,6 @@
 	        android:onClick="onGetNewCouponsButtonClicked" >
 		</Button>
 	</LinearLayout>
-</RelativeLayout>
 
         
     <!-- The navigation drawer -->

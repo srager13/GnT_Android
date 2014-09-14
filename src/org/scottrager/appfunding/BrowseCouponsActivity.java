@@ -26,7 +26,9 @@ import com.flurry.android.FlurryAgent;
 
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
+import android.app.ActionBar.Tab;
 import android.app.Activity;
+import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -50,6 +52,7 @@ import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.MenuItemCompat.OnActionExpandListener;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
@@ -68,8 +71,8 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BrowseCouponsActivity extends Activity {
-//public class BrowseCouponsActivity extends FragmentActivity {
+//public class BrowseCouponsActivity extends Activity {
+public class BrowseCouponsActivity extends FragmentActivity {
 
     public static final String TAG = "browsecoupons";
     public static final String SIDEBAR_ANIM_TAG = "sidebaranimation";
@@ -85,6 +88,10 @@ public class BrowseCouponsActivity extends Activity {
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     //private ListView categoriesDrawerList;
+    private ViewPager mViewPager;    
+    // When requested, this adapter returns a DemoObjectFragment,
+    // representing an object in the collection.
+    CouponListPagerAdapter mCouponListPagerAdapter;
 
     private ArrayList<CouponObject> coupons;
     private ArrayList<CouponObject> usedCoupons;
@@ -147,6 +154,42 @@ public class BrowseCouponsActivity extends Activity {
 		{
 		  actionBar.setHomeButtonEnabled(true);
 		}
+	    // Specify that tabs should be displayed in the action bar.
+	    actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+
+	    // ViewPager and its adapters use support library
+        // fragments, so use getSupportFragmentManager.
+	    mCouponListPagerAdapter =
+                new CouponListPagerAdapter(
+                        getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.browseCouponsPager);
+        mViewPager.setAdapter(mCouponListPagerAdapter);
+	    // Create a tab listener that is called when the user changes tabs.
+	    ActionBar.TabListener tabListener = new ActionBar.TabListener() {
+
+			@Override
+			public void onTabSelected(Tab tab, FragmentTransaction arg1) {
+	            // show the given tab		
+				 // When the tab is selected, switch to the
+	            // corresponding page in the ViewPager.
+	            mViewPager.setCurrentItem(tab.getPosition());
+			}
+			@Override
+			public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
+				// refresh data
+			}
+
+			@Override
+			public void onTabUnselected(Tab arg0, FragmentTransaction arg1) {
+	            // hide the given tab				
+			}
+	    };
+
+	    // Add 3 tabs, specifying the tab's text and TabListener
+	    actionBar.addTab( actionBar.newTab().setText("Near Me").setTabListener(tabListener) );
+	    actionBar.addTab( actionBar.newTab().setText("Ending Soon").setTabListener(tabListener) );
+	    actionBar.addTab( actionBar.newTab().setText("A-Z").setTabListener(tabListener) );
+
 		actionBar.show();
 		
 		navigationOptions = new ArrayList<String>();
@@ -485,33 +528,33 @@ public class BrowseCouponsActivity extends Activity {
 	}
 	
 	private void refreshActivity() {
+		return;
+//		TryToGetLocation();
+//		
+//		if( !executeSearch && filterCompany != null )
+//		{
+//			if( !refreshCouponListFromDBFilteredByCompany(filterCompany) )
+//			{
+//				// TODO: report a toast error - none found?
+//				refreshCouponListFromDB();
+//			}
+//		}
+//		else
+//		{
+//			refreshCouponListFromDB();
+//		}
 		
-		TryToGetLocation();
-		
-		if( !executeSearch && filterCompany != null )
-		{
-			if( !refreshCouponListFromDBFilteredByCompany(filterCompany) )
-			{
-				// TODO: report a toast error - none found?
-				refreshCouponListFromDB();
-			}
-		}
-		else
-		{
-			refreshCouponListFromDB();
-		}
-		
-		if( useLocations )
-		{
-			sortByNearest( findViewById(R.id.sort_by_nearest_button));
-		}
-		else
-		{
-			sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button));
-		}
-		drawCouponList();
-		CallSyncCoupons();
-		CallSyncRecvdCoupons();
+//		if( useLocations )
+//		{
+//			sortByNearest( findViewById(R.id.sort_by_nearest_button));
+//		}
+//		else
+//		{
+//			sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button));
+//		}
+//		drawCouponList();
+//		CallSyncCoupons();
+//		CallSyncRecvdCoupons();
 	}
 	
 	private void TryToGetLocation() {
@@ -827,90 +870,63 @@ public class BrowseCouponsActivity extends Activity {
 		//drawCouponList();
 	}
 	
-	public void sortByNearest( View view ) {
-		if( !useLocations )
-		{
-			displayCannotFindLocToast();
-			sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button) );
-			return;
-		}
-		view.setSelected(true);
-		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
-		b1.setSelected(false);
-		Button b2 = (Button) findViewById(R.id.sort_by_az_button);
-		b2.setSelected(false);
-		Button b3 = (Button) findViewById(R.id.go_to_map_button);
-		b3.setSelected(false);
-		
-		sortByValue = SortByValueEnum.SORT_BY_NEAREST;
-		drawCouponList();
-	}
-	
-//	public void onSearchButtonClick( View view ) {
-//
-//		EditText searchBox = (EditText) findViewById(R.id.coupon_search_text_box);
-//		Button searchButton = (Button)findViewById(R.id.exec_coup_search_button);
-//		
-//		if( executeSearch )
+//	public void sortByNearest( View view ) {
+//		if( !useLocations )
 //		{
-//			String companyName = searchBox.getText().toString();
-//		
-//			// change execute search button to clear
-//			searchButton.setText("Clear");
-//			executeSearch = false;
-//		
-//			refreshCouponListFromDBFilteredByCompany( companyName );
+//			displayCannotFindLocToast();
+//			sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button) );
+//			return;
 //		}
-//		else // clearing previously done search
-//		{
-//			// change execute search button to clear
-//			searchButton.setText("Go");
-//			executeSearch = false;			
-//			// clear text in search box 
-//			searchBox.setText("");
-//
-//			refreshCouponListFromDB();
-//		}
+//		view.setSelected(true);
+//		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
+//		b1.setSelected(false);
+//		Button b2 = (Button) findViewById(R.id.sort_by_az_button);
+//		b2.setSelected(false);
+//		Button b3 = (Button) findViewById(R.id.go_to_map_button);
+//		b3.setSelected(false);
+//		
+//		sortByValue = SortByValueEnum.SORT_BY_NEAREST;
 //		drawCouponList();
 //	}
-	
-	public void sortByEndingSoon( View view ) {
-		view.setSelected(true);
-		Button b1 = (Button) findViewById(R.id.sort_by_nearest_button);
-		b1.setSelected(false);
-		Button b2 = (Button) findViewById(R.id.sort_by_az_button);
-		b2.setSelected(false);
-		Button b3 = (Button) findViewById(R.id.go_to_map_button);
-		b3.setSelected(false);
-
-		sortByValue = SortByValueEnum.SORT_BY_EXP_DATE;
-		drawCouponList();
-	}
-	
-	public void sortAlphabetically( View view ) {
-		view.setSelected(true);
-		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
-		b1.setSelected(false);
-		Button b2 = (Button) findViewById(R.id.sort_by_nearest_button);
-		b2.setSelected(false);
-		Button b3 = (Button) findViewById(R.id.go_to_map_button);
-		b3.setSelected(false);
-
-		sortByValue = SortByValueEnum.SORT_BY_NAME;
-		drawCouponList();
-	}
-	
-	public void goToMap( View view ) {
-		view.setSelected(true);
-		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
-		b1.setSelected(false);
-		Button b2 = (Button) findViewById(R.id.sort_by_nearest_button);
-		b2.setSelected(false);
-		Button b3 = (Button) findViewById(R.id.sort_by_az_button);
-		b3.setSelected(false);
-		Intent intent = new Intent( this, MapActivity.class );
-		startActivity(intent);
-	}
+//	
+//	
+//	public void sortByEndingSoon( View view ) {
+//		view.setSelected(true);
+//		Button b1 = (Button) findViewById(R.id.sort_by_nearest_button);
+//		b1.setSelected(false);
+//		Button b2 = (Button) findViewById(R.id.sort_by_az_button);
+//		b2.setSelected(false);
+//		Button b3 = (Button) findViewById(R.id.go_to_map_button);
+//		b3.setSelected(false);
+//
+//		sortByValue = SortByValueEnum.SORT_BY_EXP_DATE;
+//		drawCouponList();
+//	}
+//	
+//	public void sortAlphabetically( View view ) {
+//		view.setSelected(true);
+//		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
+//		b1.setSelected(false);
+//		Button b2 = (Button) findViewById(R.id.sort_by_nearest_button);
+//		b2.setSelected(false);
+//		Button b3 = (Button) findViewById(R.id.go_to_map_button);
+//		b3.setSelected(false);
+//
+//		sortByValue = SortByValueEnum.SORT_BY_NAME;
+//		drawCouponList();
+//	}
+//	
+//	public void goToMap( View view ) {
+//		view.setSelected(true);
+//		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
+//		b1.setSelected(false);
+//		Button b2 = (Button) findViewById(R.id.sort_by_nearest_button);
+//		b2.setSelected(false);
+//		Button b3 = (Button) findViewById(R.id.sort_by_az_button);
+//		b3.setSelected(false);
+//		Intent intent = new Intent( this, MapActivity.class );
+//		startActivity(intent);
+//	}
 	
 	public double getDistance( double loc1, double loc2 )
 	{
@@ -1284,3 +1300,5 @@ public class BrowseCouponsActivity extends Activity {
 		}	
 	}
 }
+
+
