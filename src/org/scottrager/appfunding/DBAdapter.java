@@ -41,7 +41,7 @@ public class DBAdapter {
 	public static final String DATABASE_COMPANY_TABLE = "company";
 	public static final String DATABASE_LOCATIONS_TABLE = "locations";
 	public static final String DATABASE_EVENTS_TABLE = "events";
-	public static final int DATABASE_VERSION = 34;
+	public static final int DATABASE_VERSION = 35;
 	
 
 	private static final String DATABASE_CREATE_1 = "create table "+DATABASE_COMPANY_TABLE

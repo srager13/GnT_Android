@@ -24,6 +24,10 @@ import org.scottrager.appfunding.LocationService.LocationServiceBinder;
 
 import com.flurry.android.FlurryAgent;
 
+import android.annotation.SuppressLint;
+import android.app.ActionBar;
+import android.app.Activity;
+import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -39,13 +43,18 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v4.view.MenuItemCompat.OnActionExpandListener;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -55,11 +64,13 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class BrowseCouponsActivity extends FragmentActivity {
-	
+public class BrowseCouponsActivity extends Activity {
+//public class BrowseCouponsActivity extends FragmentActivity {
+
     public static final String TAG = "browsecoupons";
     public static final String SIDEBAR_ANIM_TAG = "sidebaranimation";
     public static final String POSITION_TAG = "positiontag";
@@ -72,7 +83,8 @@ public class BrowseCouponsActivity extends FragmentActivity {
     private ArrayList<String> categories;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
-    private ListView categoriesDrawerList;
+    private ActionBarDrawerToggle mDrawerToggle;
+    //private ListView categoriesDrawerList;
 
     private ArrayList<CouponObject> coupons;
     private ArrayList<CouponObject> usedCoupons;
@@ -122,11 +134,20 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	};
 
 
+	@SuppressLint("NewApi")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.browse_coupons_w_sidebars);
+		
+		ActionBar actionBar = getActionBar();
+		actionBar.setDisplayShowTitleEnabled(false);
+		if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH)
+		{
+		  actionBar.setHomeButtonEnabled(true);
+		}
+		actionBar.show();
 		
 		navigationOptions = new ArrayList<String>();
 		navigationOptions.add("Options:");
@@ -135,8 +156,37 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		navigationOptions.add("Settings");
 		navigationOptions.add("G and T Info");
 		navigationOptions.add("Logout");
+		NavDrawerArrayAdapter adapter = new NavDrawerArrayAdapter(this, navigationOptions);
+		
         mDrawerLayout = (DrawerLayout) findViewById(R.id.browse_coupons_w_sidebars);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        // Set the adapter for the list view
+        mDrawerList.setAdapter(adapter);
+//        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
+//                R.layout.options_row, navigationOptions));
+        // Set the list's click listener
+        mDrawerList.setOnItemClickListener(new NavDrawerItemClickListener());
+        mDrawerToggle = new ActionBarDrawerToggle(this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.drawable.back_button,  /* nav drawer icon to replace 'Up' caret */
+                R.string.app_name,  /* "open drawer" description */
+                R.string.cancel  /* "close drawer" description */) {
+            
+/** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+            	super.onDrawerClosed(view);
+                getActionBar().setIcon(R.drawable.app_logo);
+            }
+
+/** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+            	super.onDrawerOpened(drawerView);
+                getActionBar().setIcon(R.drawable.back_button);
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
         
         categories = new ArrayList<String>();
         categories.add("Categories:");
@@ -147,21 +197,14 @@ public class BrowseCouponsActivity extends FragmentActivity {
         categories.add("Health");
         categories.add("Services");
         categories.add("Recreation");
-        categoriesDrawerList = (ListView) findViewById(R.id.right_drawer);        
+        //categoriesDrawerList = (ListView) findViewById(R.id.right_drawer);        
+
 
         // Set the adapter for the list view
-		NavDrawerArrayAdapter adapter = new NavDrawerArrayAdapter(this, navigationOptions);
-        mDrawerList.setAdapter(adapter);
-//        mDrawerList.setAdapter(new ArrayAdapter<String>(this,
-//                R.layout.options_row, navigationOptions));
+//		CatDrawerArrayAdapter adapter2 = new CatDrawerArrayAdapter(this, categories);
+//        categoriesDrawerList.setAdapter(adapter2);
         // Set the list's click listener
-        mDrawerList.setOnItemClickListener(new NavDrawerItemClickListener());
-
-        // Set the adapter for the list view
-		CatDrawerArrayAdapter adapter2 = new CatDrawerArrayAdapter(this, categories);
-        categoriesDrawerList.setAdapter(adapter2);
-        // Set the list's click listener
-        categoriesDrawerList.setOnItemClickListener(new CatDrawerItemClickListener());
+//        categoriesDrawerList.setOnItemClickListener(new CatDrawerItemClickListener());
 
 		coupons = new ArrayList<CouponObject>();
 		usedCoupons = new ArrayList<CouponObject>();
@@ -181,11 +224,12 @@ public class BrowseCouponsActivity extends FragmentActivity {
 			executeSearch = false;
 
 			// change execute search button to clear
-			EditText searchBox = (EditText) findViewById(R.id.coupon_search_text_box);
-			searchBox.setText(filterCompany);
-			Button searchButton = (Button)findViewById(R.id.exec_coup_search_button);
-			searchButton.setText("Clear");
-			executeSearch = false;
+			// TODO?
+//			EditText searchBox = (EditText) findViewById(R.id.coupon_search_text_box);
+//			searchBox.setText(filterCompany);
+//			Button searchButton = (Button)findViewById(R.id.exec_coup_search_button);
+//			searchButton.setText("Clear");
+//			executeSearch = false;
 		}
 	}
 	@Override
@@ -224,12 +268,105 @@ public class BrowseCouponsActivity extends FragmentActivity {
     	}
 	}
 
+//	private class SearchWidgetClearListener implements SearchView.OnCloseListener {
+//		public boolean onClose()
+//		{
+//			refreshCouponListFromDB();
+//			drawCouponList();
+//			return true;
+//		}
+//	}
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_browse_coupons, menu);
-		return true;
+		getMenuInflater().inflate(R.menu.browse_coupons_w_sidebars, menu);
+		
+		// TODO:: need to create the callback to handle a search action
+//		MenuItem searchItem = menu.findItem(R.id.action_search);
+	    //SearchView searchView = (SearchView) MenuItemCompat.getActionView(R.id.action_search);
+	    // Configure the search info and add any event listeners
+
+		// Get the SearchView and set the searchable configuration
+	    SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+	    SearchView searchView = (SearchView) menu.findItem(R.id.action_search).getActionView();
+	    // Assumes current activity is the searchable activity
+	    searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+	    //searchView.setIconifiedByDefault(false); // Do not icon-ify the widget; expand it by default
+	    searchView.setOnCloseListener(
+	    		new SearchView.OnCloseListener() {
+	    			@Override
+	    			public boolean onClose()
+	    			{
+	    				Log.d(TAG, "In onClose of OnCloseListener() for the searchView Widget");
+	    				executeSearch = true;
+	    				refreshCouponListFromDB();
+	    				drawCouponList();
+	    				return true;
+	    			}
+	    		});
+
+	    MenuItem sBar = menu.findItem(R.id.action_search);
+	    if( sBar != null )
+	    {
+	    	MenuItemCompat.setOnActionExpandListener(sBar,  
+	    			
+	    		new OnActionExpandListener() {
+					@Override
+					public boolean onMenuItemActionCollapse(MenuItem item) {
+						//
+						Log.d(TAG, "Search view collapsed.  Clear search.");
+						executeSearch = true;
+						refreshCouponListFromDB();
+						drawCouponList();
+						return true;
+					}
+		
+					@Override
+					public boolean onMenuItemActionExpand(MenuItem item) {
+						//
+						Log.d(TAG, "Search view expanded.");
+						return true;
+					}
+	    	} );
+		}
+		
+		return super.onCreateOptionsMenu(menu);
 	}
+	
+	@Override
+	  public boolean onOptionsItemSelected(MenuItem item) {
+        
+		// Pass the event to ActionBarDrawerToggle, if it returns
+        // true, then it has handled the app icon touch event
+        if (mDrawerToggle.onOptionsItemSelected(item)) {
+          return true;
+        }
+        
+	    switch (item.getItemId()) {
+	    // action with ID open left drawer was selected
+	    case android.R.id.home:
+	    //case R.id.action_open_left_drawer:
+		    Toast.makeText(this, "Launch Sidebar", Toast.LENGTH_SHORT).show();
+			Log.d(SIDEBAR_ANIM_TAG, "in onLaunchSidebarButtonClick");
+	        mDrawerLayout = (DrawerLayout) findViewById(R.id.browse_coupons_w_sidebars);
+	        mDrawerLayout.openDrawer(Gravity.LEFT);
+	      break;
+	    // action with ID open right drawer was selected
+	    case R.id.show_categories:
+	      Toast.makeText(this, "Categories selected", Toast.LENGTH_SHORT).show();
+	      break;
+		// action with ID search was selected
+		case R.id.action_search:
+		  //Toast.makeText(this, "Search selected", Toast.LENGTH_SHORT).show();
+			// nothing to do here. also, listener set above can also handle opening the search view
+		      break;
+	    default:
+	      break;
+	    }
+
+	    return true;
+	  }
 	
 	@Override
 	protected void onPause() {
@@ -252,6 +389,46 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		
 		refreshActivity();
 	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+    	setIntent(intent);
+    	
+    	Log.d(TAG, "in onNewIntent");
+    	
+    	if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+    	     String query = intent.getStringExtra(SearchManager.QUERY);
+
+    	    Log.d(TAG, "Searched for "+query);
+    	    	
+    	    if( executeSearch )
+	  		{
+    	    	Log.d(TAG, "executeSearch was true");
+	  			filterCompany = query;
+	  		
+	  			// change execute search button to clear
+	  			//searchButton.setText("Clear");
+	  			executeSearch = false; // not sure if we need this any more - need to figure out how to "clear" searches
+	  		
+	  			refreshCouponListFromDBFilteredByCompany( filterCompany );
+	  		}
+	  		else // clearing previously done search
+	  		{
+
+    	    	Log.d(TAG, "executeSearch was false");
+	  			// change execute search button to clear
+	  			//searchButton.setText("Go");
+	  			executeSearch = true;			
+	  			// clear text in search box 
+	  			//searchBox.setText("");
+	  
+	  			refreshCouponListFromDB();
+	  		}
+    	    
+	  		drawCouponList();
+
+    	    }
+	}
 	
 	private class NavDrawerItemClickListener implements ListView.OnItemClickListener {
 	    @Override
@@ -267,7 +444,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	    			break;
 	    		case 2:
 					Log.d(BrowseCouponsActivity.TAG, "Should go to search coupons activity.");				
-					onGetNewCouponsButtonClicked();
+					onGetNewCouponsButtonClicked(null);
 	    			break;
 	    		case 3:
 	    			break;
@@ -360,7 +537,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		}
 	}
 	
-	public void onGetNewCouponsButtonClicked() {
+	public void onGetNewCouponsButtonClicked(View view) { // warning: do not use the "view" paramater being passed in. It is given as null when option in nav drawer chosen
 		Intent intent = new Intent( this, SearchNewCouponsActivity.class );
     	startActivity( intent );	
 	}
@@ -467,7 +644,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 
 	// returns true if successful...returns false if unable to find company that it should be filtering by
 	public boolean refreshCouponListFromDBFilteredByCompany( String CompanyName ) {
-		Log.d(TAG, "in refreshCouponListFromDB()");
+		Log.d(TAG, "in refreshCouponListFromDBFilteredByCompany(" + CompanyName + ")");
 		TryToGetLocation();
 		db.open();
 		Cursor c = db.getAllUnusedCouponsOfCompany( CompanyName );
@@ -539,6 +716,8 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	}
 	
 	public void drawCouponList() {
+		
+		Log.d(TAG, "in drawCouponList()");
 		
 		switch( sortByValue )
 		{
@@ -618,9 +797,9 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		    }
 		});
 		
-		AutoCompleteTextView editBox = (AutoCompleteTextView) findViewById( R.id.coupon_search_text_box );
-		ArrayAdapter<String> searchSuggAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);
-		editBox.setAdapter(searchSuggAdapter);
+//		AutoCompleteTextView editBox = (AutoCompleteTextView) findViewById( R.id.coupon_search_text_box );
+//		ArrayAdapter<String> searchSuggAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);
+//		editBox.setAdapter(searchSuggAdapter);
 		
 		return;
 	}
@@ -667,33 +846,33 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		drawCouponList();
 	}
 	
-	public void onSearchButtonClick( View view ) {
-
-		EditText searchBox = (EditText) findViewById(R.id.coupon_search_text_box);
-		Button searchButton = (Button)findViewById(R.id.exec_coup_search_button);
-		
-		if( executeSearch )
-		{
-			String companyName = searchBox.getText().toString();
-		
-			// change execute search button to clear
-			searchButton.setText("Clear");
-			executeSearch = false;
-		
-			refreshCouponListFromDBFilteredByCompany( companyName );
-		}
-		else // clearing previously done search
-		{
-			// change execute search button to clear
-			searchButton.setText("Go");
-			executeSearch = false;			
-			// clear text in search box 
-			searchBox.setText("");
-
-			refreshCouponListFromDB();
-		}
-		drawCouponList();
-	}
+//	public void onSearchButtonClick( View view ) {
+//
+//		EditText searchBox = (EditText) findViewById(R.id.coupon_search_text_box);
+//		Button searchButton = (Button)findViewById(R.id.exec_coup_search_button);
+//		
+//		if( executeSearch )
+//		{
+//			String companyName = searchBox.getText().toString();
+//		
+//			// change execute search button to clear
+//			searchButton.setText("Clear");
+//			executeSearch = false;
+//		
+//			refreshCouponListFromDBFilteredByCompany( companyName );
+//		}
+//		else // clearing previously done search
+//		{
+//			// change execute search button to clear
+//			searchButton.setText("Go");
+//			executeSearch = false;			
+//			// clear text in search box 
+//			searchBox.setText("");
+//
+//			refreshCouponListFromDB();
+//		}
+//		drawCouponList();
+//	}
 	
 	public void sortByEndingSoon( View view ) {
 		view.setSelected(true);

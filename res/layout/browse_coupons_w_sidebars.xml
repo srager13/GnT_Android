@@ -3,171 +3,103 @@
     android:id="@+id/browse_coupons_w_sidebars"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="@color/white" >
+    
     <!-- The main content view -->
 
-    <RelativeLayout
-            android:id="@+id/mainpage"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-    
-       <RelativeLayout
-        android:id="@+id/browse_coupons_title_bar"
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white" >
+       
+    <LinearLayout
+        android:id="@+id/sort_filter_buttons"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:background="@color/new_blue" >
+        android:layout_height="wrap_content"
+        android:layout_below="@id/coupon_search_bar_and_button"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:background="@color/blue"
+        android:orientation="horizontal" >
         
-	        <ImageView
-	            android:layout_width="wrap_content"
-	            android:layout_height="match_parent"
-	            android:background="@drawable/title_bar_gnt"
-	            android:contentDescription="@string/dummy_content"
-	            android:layout_centerHorizontal="true" />
-	
-	        <Button 
-	            android:id="@+id/launch_sidebar_button"
-	            android:layout_width="50dp"
-	            android:layout_height="50dp"
-	            android:layout_alignParentLeft="true"
-	            android:layout_marginLeft="5dp"
-	            android:layout_marginTop="5dp"
-	            android:layout_marginBottom="5dp"
-	            android:background="@drawable/sidebar_button"
-	            android:onClick="onLaunchSidebarButtonClick"/>
-	
-	        <Button
-	            android:id="@+id/launch_categories_button"
-	            android:layout_width="50dp"
-	            android:layout_height="50dp"
-	            android:layout_alignParentRight="true"
-	            android:layout_marginBottom="5dp"
-	            android:layout_marginRight="5dp"
-	            android:layout_marginTop="5dp"
-	            android:background="@drawable/categories_button" 
-	            android:onClick="onLaunchCategoriesClick" />
+        <Button
+            android:id="@+id/sort_by_nearest_button"
+            style="@style/SortCouponButtons"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:text="@string/nearest_string"
+            android:onClick="sortByNearest" />
+        
+        <Button
+            android:id="@+id/go_to_map_button"
+            style="@style/SortCouponButtons"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:text="@string/map_string"
+            android:onClick="goToMap" />
+        
+        <Button
+            android:id="@+id/sort_by_ending_soon_button"
+            style="@style/SortCouponButtons"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:text="@string/ending_soon_string"
+            android:onClick="sortByEndingSoon" />
+        
+        <Button
+            android:id="@+id/sort_by_az_button"
+            style="@style/SortCouponButtons"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:text="@string/az_string"
+            android:onClick="sortAlphabetically" />
+    </LinearLayout>
 
-    	</RelativeLayout>
+	
+	<ListView
+	    android:id="@+id/couponList"
+	    android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_below="@id/sort_filter_buttons"
+	    android:dividerHeight="1dp"
+	    android:divider="@color/black" >
+    </ListView>
+    
+    
+	<LinearLayout
+	    android:id="@+id/noCouponsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="150dp"
+        android:orientation="vertical" >
+	    <TextView
+	        android:id="@+id/noCouponsMessage"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center"
+	        android:text="@string/no_coupons_message"
+	        android:textSize="30sp"
+	        ></TextView>
 	    
-	    <LinearLayout
-	        android:id="@+id/coupon_search_bar_and_button"
-	        android:layout_width="match_parent"
+	    <Button
+	        android:id="@+id/getNewCouponsButton"
+	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
-	        android:layout_below="@id/browse_coupons_title_bar"
-	        android:layout_marginTop="0dp"
-	        android:layout_marginBottom="0dp"
-	        android:paddingTop="2dp"      
-	        android:paddingBottom="2dp"  
-	        android:paddingRight="5dp"
-	        android:background="@color/button_bckgrnd_color"
-	        android:orientation="horizontal" >
-		    <AutoCompleteTextView 
-		         
-				android:id="@+id/coupon_search_text_box"
-				style="@style/EditTextBoxes"
-				android:layout_weight="1"    	    
-			    android:layout_width="0dp"
-			    android:layout_height="wrap_content"
-			    android:hint="@string/search_string"
-			    android:inputType="textCapWords" />  
-			    
-		    <Button 
-		        android:id="@+id/exec_coup_search_button"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_marginLeft="3dp"
-		        android:text="@string/go_string"
-		        android:textSize="20sp"
-		        android:onClick="onSearchButtonClick"
-		        style="@style/ExecSearchButton" />
-		</LinearLayout>
-    
-	    <LinearLayout
-	        android:id="@+id/sort_filter_buttons"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_below="@id/coupon_search_bar_and_button"
-	        android:paddingTop="6dp"
-	        android:paddingBottom="6dp"
-	        android:background="@color/blue"
-	        android:orientation="horizontal" >
-	        
-	        <Button
-	            android:id="@+id/sort_by_nearest_button"
-	            style="@style/SortCouponButtons"
-	            android:layout_weight="1"
-	            android:layout_width="0dp"
-	            android:layout_height="fill_parent"
-	            android:layout_marginLeft="5dp"
-	            android:text="@string/nearest_string"
-	            android:onClick="sortByNearest" />
-	        
-	        <Button
-	            android:id="@+id/go_to_map_button"
-	            style="@style/SortCouponButtons"
-	            android:layout_weight="1"
-	            android:layout_width="0dp"
-	            android:layout_height="fill_parent"
-	            android:layout_marginLeft="5dp"
-	            android:text="@string/map_string"
-	            android:onClick="goToMap" />
-	        
-	        <Button
-	            android:id="@+id/sort_by_ending_soon_button"
-	            style="@style/SortCouponButtons"
-	            android:layout_weight="1"
-	            android:layout_width="0dp"
-	            android:layout_height="fill_parent"
-	            android:layout_marginLeft="5dp"
-	            android:text="@string/ending_soon_string"
-	            android:onClick="sortByEndingSoon" />
-	        
-	        <Button
-	            android:id="@+id/sort_by_az_button"
-	            style="@style/SortCouponButtons"
-	            android:layout_weight="1"
-	            android:layout_width="0dp"
-	            android:layout_height="fill_parent"
-	            android:layout_marginLeft="5dp"
-	            android:text="@string/az_string"
-	            android:onClick="sortAlphabetically" />
-	    </LinearLayout>
-
-	
-		<ListView
-		    android:id="@+id/couponList"
-		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
-		    android:layout_below="@id/sort_filter_buttons"
-		    android:dividerHeight="1dp"
-		    android:divider="@color/black" >
-	    </ListView>
-    
-		<LinearLayout
-		    android:id="@+id/noCouponsLayout"
-	        android:layout_width="match_parent"
-	        android:layout_height="wrap_content"
-	        android:layout_marginTop="150dp"
-	        android:orientation="vertical" >
-		    <TextView
-		        android:id="@+id/noCouponsMessage"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_gravity="center"
-		        android:text="@string/no_coupons_message"
-		        android:textSize="30sp"
-		        ></TextView>
-		    
-		    <Button
-		        android:id="@+id/getNewCouponsButton"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:layout_gravity="center"
-		        style="@style/HomeScreenButtons"
-		        android:text="@string/get_new_coupons_string" >
-			</Button>
-		</LinearLayout>
-	
-	</RelativeLayout>
+	        android:layout_gravity="center"
+	        style="@style/HomeScreenButtons"
+	        android:text="@string/get_new_coupons_string" 
+	        android:onClick="onGetNewCouponsButtonClicked" >
+		</Button>
+	</LinearLayout>
+</RelativeLayout>
 
         
     <!-- The navigation drawer -->
@@ -179,14 +111,5 @@
         android:divider="@color/black"
         android:dividerHeight="0dp"
         android:background="@color/gray"/>
-            
-    <!-- The navigation drawer -->
-    <ListView android:id="@+id/right_drawer"
-        android:layout_width="240dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:choiceMode="singleChoice"
-        android:divider="@color/black"
-        android:dividerHeight="0dp"
-        android:background="@color/gray"/>
+
 </android.support.v4.widget.DrawerLayout>

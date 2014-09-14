@@ -4,6 +4,9 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -49,7 +52,11 @@ public class CouponDisplayActivity extends FragmentActivity {
 	   int logoId = getResources().getIdentifier("drawable/" + imageName, "drawable", getPackageName());
 
 	   ImageView imageView = (ImageView)findViewById(R.id.company_logo);
-	   imageView.setImageDrawable( getResources().getDrawable(logoId) );
+	   BitmapFactory.Options options = new BitmapFactory.Options();
+	   options.inJustDecodeBounds = true;
+	   BitmapFactory.decodeResource( getResources(), logoId, options);
+		
+	   imageView.setImageBitmap( decodeSampledBitmapFromResource(getResources(), logoId, 64, 64)); // guessing at desired dimensions right now because I don't know how big this is/needs to be
 	    
 	   TextView compName = (TextView)findViewById(R.id.company_name_title);
 	   compName.setText( companyName );
@@ -171,4 +178,42 @@ public class CouponDisplayActivity extends FragmentActivity {
         startActivity( intent );
         //startActivityForResult( coupDisplayIntent, use_coup_request_Code );
 	}
+	  public static int calculateInSampleSize(
+	            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+	    // Raw height and width of image
+	    final int height = options.outHeight;
+	    final int width = options.outWidth;
+	    int inSampleSize = 1;
+
+	    if (height > reqHeight || width > reqWidth) {
+
+	        final int halfHeight = height / 2;
+	        final int halfWidth = width / 2;
+
+	        // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+	        // height and width larger than the requested height and width.
+	        while ((halfHeight / inSampleSize) > reqHeight
+	                && (halfWidth / inSampleSize) > reqWidth) {
+	            inSampleSize *= 2;
+	        }
+	    }
+
+	    return inSampleSize;
+	}
+	  
+	  public static Bitmap decodeSampledBitmapFromResource(Resources res, int resId,
+		        int reqWidth, int reqHeight) {
+
+		    // First decode with inJustDecodeBounds=true to check dimensions
+		    final BitmapFactory.Options options = new BitmapFactory.Options();
+		    options.inJustDecodeBounds = true;
+		    BitmapFactory.decodeResource(res, resId, options);
+
+		    // Calculate inSampleSize
+		    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+		    // Decode bitmap with inSampleSize set
+		    options.inJustDecodeBounds = false;
+		    return BitmapFactory.decodeResource(res, resId, options);
+		}
 }

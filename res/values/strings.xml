@@ -13,7 +13,7 @@
     <string name="title_pic_desc">Application Logo</string>
     <string name="picture_desc">Picture</string>
     <string name="title_activity_search_new_coupons">Find New Coupons</string>
-    <string name="search_hint">Enter Organization Name</string>
+    <string name="search_hint">Search Organizations</string>
     <string name="search_string">Search</string>
     <string name="go_string">Go</string>
     <string name="buy_string">Buy</string>
@@ -60,6 +60,7 @@
     <string name="coupon_used_thank_you_message">Thank you for using Give &amp; Take!  We hope you continue to take advantage of great values like this one!</string>
     <string name="title_activity_enter_coup_confirm_code">Enter Confirmation Code</string>
     <string name="options_string">Options</string>
+    <string name="categories_string">Categories</string>
     <string name="title_activity_login">Login</string>
     <string name="username">Username:</string>
     <string name="password">Password:</string>
@@ -84,5 +85,7 @@
     <string name="credit_card_CVC_hint">3 or 4 digits</string>
     <string name="credit_card_exp_date_month_hint">2 digit month</string>
     <string name="credit_card_exp_date_year_hint">4 digit year</string>
+    <string name="title_activity_search_results">SearchResultsActivity</string>
+    <string name="action_settings">Settings</string>
 
 </resources>
