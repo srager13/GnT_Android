@@ -1,7 +1,5 @@
 package org.scottrager.appfunding;
 
-import java.util.Collections;
-
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,9 +9,9 @@ import android.util.Log;
 
 public class CouponListPagerAdapter extends FragmentPagerAdapter {
 
-	public enum SortState {
-		Nearest, Expiring, Alphabetical
-	}
+//	public enum SortState {
+//		Nearest, Expiring, Alphabetical
+//	}
 	
 	public CouponListPagerAdapter(FragmentManager fm) {
 	   super(fm);
@@ -21,25 +19,27 @@ public class CouponListPagerAdapter extends FragmentPagerAdapter {
 	
 	@Override
 	public Fragment getItem(int i) {
+	
+		Log.d(CouponListFragment.TAG, "in CouponListPagerAdapter:  int passed to getItem() = "+i);
 	   Fragment fragment = new CouponListFragment();
 	   Bundle args = new Bundle();
-//		switch( i )
-//		{
-//			case SortByValueEnum.SORT_BY_NAME:
-//				Log.d(BrowseCouponsActivity.TAG,  "Sorting by Name");
-//				args.putInt(CouponListFragment.ARG_OBJECT, i);
-//				break;
-//			case SORT_BY_NEAREST:
-//				Log.d(BrowseCouponsActivity.TAG,  "Sorting by Nearest");
-//				args.putInt(CouponListFragment.ARG_OBJECT, i);
-//				break;
-//			case SORT_BY_EXP_DATE:
-//				Log.d(BrowseCouponsActivity.TAG,  "Sorting by Exp Date");
-//				args.putInt(CouponListFragment.ARG_OBJECT, i);
-//				break;
-//			default:
-//				break;
-//		}
+		switch( i )
+		{
+			case 0:
+				Log.d(BrowseCouponsActivity.TAG,  "Sorting by Nearest");
+				args.putInt(CouponListFragment.ARG_OBJECT, i);
+				break;
+			case 1:
+				Log.d(BrowseCouponsActivity.TAG,  "Sorting by Exp Date");
+				args.putInt(CouponListFragment.ARG_OBJECT, i);
+				break;
+			case 2:
+				Log.d(BrowseCouponsActivity.TAG,  "Sorting by Name (A-Z)");
+				args.putInt(CouponListFragment.ARG_OBJECT, i);
+				break;
+			default:
+				break;
+		}
 	   args.putInt(CouponListFragment.ARG_OBJECT, i);
 	   ((Fragment) fragment).setArguments(args);
 	   return fragment;

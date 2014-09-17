@@ -30,7 +30,7 @@ import android.widget.AdapterView.OnItemClickListener;
 //object in our collection.
 public class CouponListFragment extends Fragment {
 	 public static final String ARG_OBJECT = "object";
-	 public static final String TAG = "browsecoupons";
+	 public static final String TAG = "couponlistfragment";
 	
 	 private DBAdapter db;
 	 private ArrayList<CouponObject> coupons;
@@ -38,7 +38,17 @@ public class CouponListFragment extends Fragment {
 	 private static SortByValueEnum sortByValue = SortByValueEnum.SORT_BY_NEAREST;
 
 	private int use_coup_request_Code = 1;
-	 
+
+	static CouponListFragment Init( int arg )
+	{
+		CouponListFragment listFrag = new CouponListFragment();
+		// Supply arg input as an argument.
+        Bundle args = new Bundle();
+        args.putInt(ARG_OBJECT, arg);
+        listFrag.setArguments(args);
+        return listFrag;
+	}
+	
 	 @Override
 	 public View onCreateView(LayoutInflater inflater,
 	         ViewGroup container, Bundle savedInstanceState) {
@@ -50,19 +60,23 @@ public class CouponListFragment extends Fragment {
 	     // properly.
 	     View rootView = inflater.inflate( R.layout.coupon_list, container, false );
 	     Bundle args = getArguments();
+	     Log.d(CouponListFragment.TAG, "Argument Passed in = "+args.getInt(ARG_OBJECT));
 	     switch( args.getInt(ARG_OBJECT) )
 	     {
-		     case 1:
+		     case 0:
 		    	 sortByValue = SortByValueEnum.SORT_BY_NEAREST;
+			     Log.d(CouponListFragment.TAG, "Setting sortByValue to SORT_BY_NEAREST");
+		    	 break;
+		     case 1:
+		    	 sortByValue = SortByValueEnum.SORT_BY_EXP_DATE;
+			     Log.d(CouponListFragment.TAG, "Setting sortByValue to SORT_BY_EXP_DATE");
 		    	 break;
 		     case 2:
-		    	 sortByValue = SortByValueEnum.SORT_BY_EXP_DATE;
-		    	 break;
-		     case 3:
-		    	 sortByValue = SortByValueEnum.SORT_BY_NEAREST;
+		    	 sortByValue = SortByValueEnum.SORT_BY_NAME;
+			     Log.d(CouponListFragment.TAG, "Setting sortByValue to SORT_BY_NAME");
 		    	 break;
 	     }
-	     
+	     refreshActivity();
 	     
 	     return rootView;
 	 }
@@ -79,9 +93,9 @@ public class CouponListFragment extends Fragment {
 			{
 				do
 				{
-					Log.d(BrowseCouponsActivity.TAG, "rowId = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));	
-					Log.d(BrowseCouponsActivity.TAG, "company name = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)));
-					Log.d(BrowseCouponsActivity.TAG, "coupon details = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)));
+					Log.d(TAG, "rowId = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));	
+					Log.d(TAG, "company name = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)));
+					Log.d(TAG, "coupon details = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)));
 					
 					boolean favorite;
 					int fav = c.getInt(c.getColumnIndex(DBAdapter.KEY_FAVORITE));
@@ -93,10 +107,10 @@ public class CouponListFragment extends Fragment {
 					{
 						favorite = true;
 					}
-					Log.d(BrowseCouponsActivity.TAG, "favorites = " + fav );
-					Log.d(BrowseCouponsActivity.TAG, "Exp Date = "+c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)));
-					Log.d(BrowseCouponsActivity.TAG, "Logo = "+c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)));
-					Log.d(BrowseCouponsActivity.TAG, "Date Used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
+					Log.d(CouponListFragment.TAG, "favorites = " + fav );
+					Log.d(CouponListFragment.TAG, "Exp Date = "+c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)));
+					Log.d(CouponListFragment.TAG, "Logo = "+c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)));
+					Log.d(CouponListFragment.TAG, "Date Used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
 
 					double distance = getDistance( 1.0, 1.0 );
 					if( useLocations )
@@ -113,7 +127,7 @@ public class CouponListFragment extends Fragment {
 					}
 					else
 					{
-						Log.d(BrowseCouponsActivity.TAG, "Setting distance for coupon to 0.0 (useLocations = false)");
+						Log.d(CouponListFragment.TAG, "Setting distance for coupon to 0.0 (useLocations = false)");
 						distance = -1.0;
 					}					
 					Log.d(BrowseCouponsActivity.LOCATION_TAG, "Distance = "+distance);
@@ -133,9 +147,41 @@ public class CouponListFragment extends Fragment {
 			}
 			else
 			{
-				Log.d(BrowseCouponsActivity.TAG, "No coupons in database.");
+				Log.d(CouponListFragment.TAG, "No coupons in database.");
 			}
 			db.close();		
+		}	
+		
+		
+		private void refreshActivity() {
+			
+//			TryToGetLocation();
+//			
+//			if( !executeSearch && filterCompany != null )
+//			{
+//				if( !refreshCouponListFromDBFilteredByCompany(filterCompany) )
+//				{
+//					// TODO: report a toast error - none found?
+//					refreshCouponListFromDB();
+//				}
+//			}
+//			else
+//			{
+//				refreshCouponListFromDB();
+//			}
+			
+//			if( useLocations )
+//			{
+//				sortByNearest( getFragment().findViewById(R.id.sort_by_nearest_button));
+//			}
+//			else
+//			{
+//				sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button));
+//			}
+			refreshCouponListFromDB();
+			drawCouponList();
+//			CallSyncCoupons();
+//			CallSyncRecvdCoupons();
 		}
 		
 		public void drawCouponList() {
@@ -170,55 +216,60 @@ public class CouponListFragment extends Fragment {
 				//}
 			}
 			CouponListArrayAdapter adapter = new CouponListArrayAdapter(getActivity(), coupons, names, true);
-			TextView noCoupsMessage = (TextView)getActivity().findViewById(R.id.noCouponsMessage);
-			Button getNewCoupsButton = (Button)getActivity().findViewById(R.id.getNewCouponsButton);
+			//TextView noCoupsMessage = (TextView)getActivity().findViewById(R.id.FragNoCouponsMessage);
+			//Button getNewCoupsButton = (Button)getActivity().findViewById(R.id.FragGetNewCouponsButton);
 
 			if( coupons.isEmpty() )
 			{
 				Log.d(TAG, "No coupons to draw");
-				ListView list = (ListView)getActivity().findViewById(R.id.couponList);
+				ListView list = (ListView)getActivity().findViewById(R.id.FragCouponList);
 				list.setAdapter(null);
-				noCoupsMessage.setText(R.string.no_coupons_message);
-				noCoupsMessage.bringToFront();
-				noCoupsMessage.setVisibility(View.VISIBLE);
-				getNewCoupsButton.setVisibility(View.VISIBLE);
-				getNewCoupsButton.setClickable(true);
-				getNewCoupsButton.bringToFront();
+//				noCoupsMessage.setText(R.string.no_coupons_message);
+//				noCoupsMessage.bringToFront();
+//				noCoupsMessage.setVisibility(View.VISIBLE);
+//				getNewCoupsButton.setVisibility(View.VISIBLE);
+//				getNewCoupsButton.setClickable(true);
+//				getNewCoupsButton.bringToFront();
 				return;
 			}
+//			else
+//			{
+//				noCoupsMessage.setVisibility(View.GONE);
+//				getNewCoupsButton.setVisibility(View.GONE);
+//			}
+			
+			ListView list = (ListView)getActivity().findViewById(R.id.FragCouponList);
+			if( list == null )
+				Log.d(CouponListFragment.TAG, "list pointer is null");
 			else
 			{
-				noCoupsMessage.setVisibility(View.GONE);
-				getNewCoupsButton.setVisibility(View.GONE);
+				list.setAdapter(adapter);
+				list.setOnItemClickListener(new OnItemClickListener() {
+				    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+				    	String imageName = coupons.get(position).getCouponPic();
+				    	String companyName = coupons.get(position).getCouponName();
+				    	String couponDetail = coupons.get(position).getCouponDetail();
+	
+				        Intent coupDisplayIntent = new Intent(v.getContext(), CouponDisplayActivity.class);
+				        Bundle b = new Bundle();
+				        b.putString("couponPic", imageName);
+				        b.putInt("position", position);
+				        b.putString("companyName", companyName);
+				        b.putString("couponDetail", couponDetail);
+				        b.putBoolean("usable", true);
+				        coupDisplayIntent.putExtras(b);
+				        
+				        // Capture author info & user status
+				        Map<String, String> couponParams = new HashMap<String, String>();
+				 
+				        couponParams.put("companyName", companyName); 
+				        couponParams.put("couponDetail", couponDetail); 
+				        FlurryAgent.logEvent("couponViewed", couponParams);
+	
+				        startActivityForResult( coupDisplayIntent, use_coup_request_Code );
+				    }
+				});
 			}
-			
-			ListView list = (ListView)getActivity().findViewById(R.id.couponList);
-			list.setAdapter(adapter);
-			list.setOnItemClickListener(new OnItemClickListener() {
-			    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-			    	String imageName = coupons.get(position).getCouponPic();
-			    	String companyName = coupons.get(position).getCouponName();
-			    	String couponDetail = coupons.get(position).getCouponDetail();
-
-			        Intent coupDisplayIntent = new Intent(v.getContext(), CouponDisplayActivity.class);
-			        Bundle b = new Bundle();
-			        b.putString("couponPic", imageName);
-			        b.putInt("position", position);
-			        b.putString("companyName", companyName);
-			        b.putString("couponDetail", couponDetail);
-			        b.putBoolean("usable", true);
-			        coupDisplayIntent.putExtras(b);
-			        
-			        // Capture author info & user status
-			        Map<String, String> couponParams = new HashMap<String, String>();
-			 
-			        couponParams.put("companyName", companyName); 
-			        couponParams.put("couponDetail", couponDetail); 
-			        FlurryAgent.logEvent("couponViewed", couponParams);
-
-			        startActivityForResult( coupDisplayIntent, use_coup_request_Code );
-			    }
-			});
 			
 //			AutoCompleteTextView editBox = (AutoCompleteTextView) findViewById( R.id.coupon_search_text_box );
 //			ArrayAdapter<String> searchSuggAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);

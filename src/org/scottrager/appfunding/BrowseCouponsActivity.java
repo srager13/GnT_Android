@@ -49,6 +49,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.MenuItemCompat.OnActionExpandListener;
@@ -56,9 +57,11 @@ import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -172,11 +175,15 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	            // show the given tab		
 				 // When the tab is selected, switch to the
 	            // corresponding page in the ViewPager.
+				Log.d(BrowseCouponsActivity.TAG, "tab.getPosition in onTabSelected() (in BCA.java) = "+tab.getPosition());
+				Log.d(CouponListFragment.TAG, "tab.getPosition in onTabSelected() (in BCA.java) = "+tab.getPosition());
 	            mViewPager.setCurrentItem(tab.getPosition());
 			}
 			@Override
-			public void onTabReselected(Tab arg0, FragmentTransaction arg1) {
-				// refresh data
+			public void onTabReselected(Tab tab, FragmentTransaction arg1) {
+				// refresh data?
+				Log.d(BrowseCouponsActivity.TAG, "in onTabReselected() (in BCA.java), tab.getPosition = "+tab.getPosition());
+				Log.d(CouponListFragment.TAG, "in onTabReselected() (in BCA.java), tab.getPosition = "+tab.getPosition());
 			}
 
 			@Override
@@ -189,6 +196,16 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	    actionBar.addTab( actionBar.newTab().setText("Near Me").setTabListener(tabListener) );
 	    actionBar.addTab( actionBar.newTab().setText("Ending Soon").setTabListener(tabListener) );
 	    actionBar.addTab( actionBar.newTab().setText("A-Z").setTabListener(tabListener) );
+	    
+	    mViewPager.setOnPageChangeListener(
+	            new ViewPager.SimpleOnPageChangeListener() {
+	                @Override
+	                public void onPageSelected(int position) {
+	                    // When swiping between pages, select the
+	                    // corresponding tab.
+	                    getActionBar().setSelectedNavigationItem(position);
+	                }
+	            });
 
 		actionBar.show();
 		
@@ -275,6 +292,18 @@ public class BrowseCouponsActivity extends FragmentActivity {
 //			executeSearch = false;
 		}
 	}
+	
+    
+    private List<Fragment> getFragments(){
+    	List<Fragment> fList = new ArrayList<Fragment>();
+    	
+    	fList.add(CouponListFragment.Init(0));
+    	fList.add(CouponListFragment.Init(1));
+    	fList.add(CouponListFragment.Init(2));
+    	
+    	return fList;
+    }
+	
 	@Override
 	public void onStart() {
 		Log.d(TAG, "In onStart");
@@ -1300,5 +1329,3 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		}	
 	}
 }
-
-
