@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -51,6 +52,9 @@ import android.os.IBinder;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.ListFragment;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.view.MenuItemCompat.OnActionExpandListener;
 import android.support.v4.view.ViewPager;
@@ -176,14 +180,14 @@ public class BrowseCouponsActivity extends FragmentActivity {
 				 // When the tab is selected, switch to the
 	            // corresponding page in the ViewPager.
 				Log.d(BrowseCouponsActivity.TAG, "tab.getPosition in onTabSelected() (in BCA.java) = "+tab.getPosition());
-				Log.d(CouponListFragment.TAG, "tab.getPosition in onTabSelected() (in BCA.java) = "+tab.getPosition());
+				//Log.d(CouponListFragment.TAG, "tab.getPosition in onTabSelected() (in BCA.java) = "+tab.getPosition());
 	            mViewPager.setCurrentItem(tab.getPosition());
 			}
 			@Override
 			public void onTabReselected(Tab tab, FragmentTransaction arg1) {
 				// refresh data?
 				Log.d(BrowseCouponsActivity.TAG, "in onTabReselected() (in BCA.java), tab.getPosition = "+tab.getPosition());
-				Log.d(CouponListFragment.TAG, "in onTabReselected() (in BCA.java), tab.getPosition = "+tab.getPosition());
+				//Log.d(CouponListFragment.TAG, "in onTabReselected() (in BCA.java), tab.getPosition = "+tab.getPosition());
 			}
 
 			@Override
@@ -294,16 +298,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	}
 	
     
-    private List<Fragment> getFragments(){
-    	List<Fragment> fList = new ArrayList<Fragment>();
-    	
-    	fList.add(CouponListFragment.Init(0));
-    	fList.add(CouponListFragment.Init(1));
-    	fList.add(CouponListFragment.Init(2));
-    	
-    	return fList;
-    }
-	
 	@Override
 	public void onStart() {
 		Log.d(TAG, "In onStart");
@@ -676,6 +670,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 				Log.d(BrowseCouponsActivity.TAG, "Date Used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
 
 				double distance = getDistance( 1.0, 1.0 );
+				
 				if( useLocations )
 				{
 					Log.d(LOCATION_TAG, "Finding location for coupon (useLocations = true)");
@@ -1328,4 +1323,220 @@ public class BrowseCouponsActivity extends FragmentActivity {
 			return false;
 		}	
 	}
+	
+
+    public static class CouponListPagerAdapter extends FragmentStatePagerAdapter {
+        public CouponListPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return CouponListFragment.newInstance(position);
+        }
+    }
+
+    public static class CouponListFragment extends ListFragment {
+        int mNum;
+        private ArrayList<CouponObject> coupons;
+        private int use_coup_request_Code = 1;
+   	 	private DBAdapter db;
+   	 	private Random r;
+
+   	 	private static SortByValueEnum sortByValue = SortByValueEnum.SORT_BY_NEAREST;
+        
+        /**
+         * Create a new instance of CountingFragment, providing "num"
+         * as an argument.
+         */
+        static CouponListFragment newInstance(int num) {
+        	CouponListFragment f = new CouponListFragment();
+
+            // Supply num input as an argument.
+            Bundle args = new Bundle();
+            args.putInt("num", num);
+            f.setArguments(args);
+
+            return f;
+        }
+
+        /**
+         * When creating, retrieve this instance's number from its arguments.
+         */
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            mNum = getArguments() != null ? getArguments().getInt("num") : 1;
+	   	     switch( mNum )
+	   	     {
+	   		     case 0:
+	   		    	 sortByValue = SortByValueEnum.SORT_BY_NEAREST;
+	   			     Log.d("couponlistfragment", "Setting sortByValue to SORT_BY_NEAREST (in onCreate)");
+	   		    	 break;
+	   		     case 1:
+	   		    	 sortByValue = SortByValueEnum.SORT_BY_EXP_DATE;
+	   			     Log.d("couponlistfragment", "Setting sortByValue to SORT_BY_EXP_DATE (in onCreate)");
+	   		    	 break;
+	   		     case 2:
+	   		    	 sortByValue = SortByValueEnum.SORT_BY_NAME;
+	   			     Log.d("couponlistfragment", "Setting sortByValue to SORT_BY_NAME (in onCreate)");
+	   		    	 break;
+	   	     }
+            r = new Random();
+        }
+
+        /**
+         * The Fragment's UI is just a simple text view showing its
+         * instance number.
+         */
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                Bundle savedInstanceState) {
+            View v = inflater.inflate(R.layout.coupon_list, container, false);
+            
+            db = new DBAdapter(getActivity());
+            coupons = new ArrayList<CouponObject>();
+            refreshCouponListFromDB();
+			switch( sortByValue )
+			{
+				case SORT_BY_NAME:
+					Log.d(TAG,  "Sorting by Name");
+					Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.NAME_SORT) ) );
+					break;
+				case SORT_BY_NEAREST:
+					Log.d(TAG,  "Sorting by Nearest");
+					Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.NEAREST_SORT, CouponComparator.NAME_SORT) ) );
+					break;
+				case SORT_BY_EXP_DATE:
+					Log.d(TAG,  "Sorting by Exp Date");
+					Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.EXP_DATE_SORT, CouponComparator.NAME_SORT) ) );
+					break;
+				default:
+					break;
+			}
+            ArrayList<String> names = new ArrayList<String>();
+			for( int i = 0; i < coupons.size(); i++ )
+			{
+				//if( !names.contains(coupons.get(i).getCouponName()) )
+				//{
+					names.add(coupons.get(i).getCouponName());
+				//}
+			}
+			CouponListArrayAdapter adapter = new CouponListArrayAdapter(getActivity(), coupons, names, true);
+			setListAdapter(adapter);
+            
+            
+            return v;
+        }
+
+        @Override
+        public void onActivityCreated(Bundle savedInstanceState) {
+            super.onActivityCreated(savedInstanceState);
+        }
+
+        @Override
+        public void onListItemClick(ListView l, View v, int position, long id) {
+            Log.i("FragmentList", "Item clicked: " + id);
+            String imageName = coupons.get(position).getCouponPic();
+	    	String companyName = coupons.get(position).getCouponName();
+	    	String couponDetail = coupons.get(position).getCouponDetail();
+
+	        Intent coupDisplayIntent = new Intent(v.getContext(), CouponDisplayActivity.class);
+	        Bundle b = new Bundle();
+	        b.putString("couponPic", imageName);
+	        b.putInt("position", position);
+	        b.putString("companyName", companyName);
+	        b.putString("couponDetail", couponDetail);
+	        b.putBoolean("usable", true);
+	        coupDisplayIntent.putExtras(b);
+	        
+	        // Capture author info & user status
+	        Map<String, String> couponParams = new HashMap<String, String>();
+	 
+	        couponParams.put("companyName", companyName); 
+	        couponParams.put("couponDetail", couponDetail); 
+	        FlurryAgent.logEvent("couponViewed", couponParams);
+
+	        startActivityForResult( coupDisplayIntent, use_coup_request_Code );
+
+        }
+        public void refreshCouponListFromDB() {
+			Log.d(TAG, "in refreshCouponListFromDB()");
+			//TryToGetLocation();
+			db.open();
+			Cursor c = db.getAllUnusedCoupons();
+
+			coupons.clear();
+
+			if( c.moveToFirst() ) // at least one row was returned
+			{
+				do
+				{
+					Log.d(TAG, "rowId = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));	
+					Log.d(TAG, "company name = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)));
+					Log.d(TAG, "coupon details = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)));
+					
+					boolean favorite;
+					int fav = c.getInt(c.getColumnIndex(DBAdapter.KEY_FAVORITE));
+					if( fav == 0 )
+					{
+						favorite = false;
+					}
+					else
+					{
+						favorite = true;
+					}
+					Log.d("couponlistfragment", "favorites = " + fav );
+					Log.d("couponlistfragment", "Exp Date = "+c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)));
+					Log.d("couponlistfragment", "Logo = "+c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)));
+					Log.d("couponlistfragment", "Date Used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
+
+					//double distance = getDistance( 1.0, 1.0 );
+					double distance = 2000.0*r.nextDouble();
+					if( false )//useLocations )
+					{
+						Log.d(BrowseCouponsActivity.LOCATION_TAG, "Finding location for coupon (useLocations = true)");
+					
+					//	float results[] = {(float) 0.0, (float) 0.0, (float) 0.0};
+					//	Log.d(TAG, "Current latitude: " + currentLocation.getLatitude() + ", Current longitude: " + currentLocation.getLongitude() );
+						
+//						Location.distanceBetween( currentLocation.getLatitude(), currentLocation.getLongitude(), 
+//								c.getFloat(c.getColumnIndex(DBAdapter.KEY_LATITUDE)), c.getFloat(c.getColumnIndex(DBAdapter.KEY_LONGITUDE)), results );
+//						distance = results[0];
+						distance = 1.0;
+					}
+					else
+					{
+						//Log.d(CouponListFragment.TAG, "Setting distance for coupon to 0.0 (useLocations = false)");
+						distance = -1.0;
+						distance = 2000.0*r.nextDouble();
+					}					
+					Log.d(BrowseCouponsActivity.LOCATION_TAG, "Distance = "+distance);
+					
+					//String name, String exp_date, String pic, String detail, 
+					//       boolean fav, int rowid, double dist, int date_used
+					CouponObject newCoup = new CouponObject( c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)),
+							c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)),
+							c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)),
+							c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)),
+							favorite, 
+							c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
+							distance,
+							0); // can simply put 0 for date_used since query only returned coups with this value
+					coupons.add(newCoup);
+				}while( c.moveToNext() );
+			}
+			else
+			{
+				Log.d("couponlistfragment", "No coupons in database.");
+			}
+			db.close();		
+		}	
+    }
+
 }
