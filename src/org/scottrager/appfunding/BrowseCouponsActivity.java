@@ -28,14 +28,12 @@ import com.flurry.android.FlurryAgent;
 import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -66,19 +64,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//public class BrowseCouponsActivity extends Activity {
 public class BrowseCouponsActivity extends FragmentActivity {
 
     public static final String TAG = "browsecoupons";
@@ -86,67 +79,16 @@ public class BrowseCouponsActivity extends FragmentActivity {
     public static final String POSITION_TAG = "positiontag";
     public static final String LOCATION_TAG = "locationtag";
 
-    public static boolean CREATE_FILES_MANUALLY = false;
-	private static final String PREFS_FILE = "GiveAndTakePrefs";
+    private static final String PREFS_FILE = "GiveAndTakePrefs";
     public String[] myFiles;
     private ArrayList<String> navigationOptions;
-    private ArrayList<String> categories;
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
-    //private ListView categoriesDrawerList;
     private ViewPager mViewPager;    
     // When requested, this adapter returns a DemoObjectFragment,
     // representing an object in the collection.
     CouponListPagerAdapter mCouponListPagerAdapter;
-
-    private ArrayList<CouponObject> coupons;
-    private ArrayList<CouponObject> usedCoupons;
-    private ArrayList<CouponObject> unsyncedCoupons;
-	
-	LocationServiceBinder binder;
-	
-	private LocationService locationService;
-	//private LocationListener locationListener;
-	private Location currentLocation;
-	private boolean useLocations = false;
-	
-	// if true, button to right of search bar executes search, otherwise, it clears the search
-	//   button text(background) will be set to proper value
-	private boolean executeSearch;
-	private String filterCompany;
-    
-    private static SortByValueEnum sortByValue = SortByValueEnum.SORT_BY_NEAREST;
-	
-	private DBAdapter db;
-	private int use_coup_request_Code = 1;
-	
-	private boolean mBound = false;
-	
-	private ServiceConnection mConnection = new ServiceConnection() {
-	    public void onServiceConnected(ComponentName className,
-	            IBinder service) {
-	        // This is called when the connection with the service has been
-	        // established, giving us the service object we can use to
-	        // interact with the service.  We are communicating with our
-	        // service through an IDL interface, so get a client-side
-	        // representation of that from the raw service object.
-	    	binder = (LocationServiceBinder)service;
-	    	locationService = binder.getService();
-	    	mBound = true;
-
-			Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity: bound to location service");
-			refreshActivity();
-	    }
-
-	    public void onServiceDisconnected(ComponentName className) {
-	        // This is called when the connection with the service has been
-	        // unexpectedly disconnected -- that is, its process crashed.
-	    	mBound = false;
-			Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity: bind to location service disconnected");
-	    }
-	};
-
 
 	@SuppressLint("NewApi")
 	@Override
@@ -251,41 +193,15 @@ public class BrowseCouponsActivity extends FragmentActivity {
 
         // Set the drawer toggle as the DrawerListener
         mDrawerLayout.setDrawerListener(mDrawerToggle);
-        
-        categories = new ArrayList<String>();
-        categories.add("Categories:");
-        categories.add("All");
-        categories.add("Restaurants");
-        categories.add("Entertainment");
-        categories.add("Shopping");
-        categories.add("Health");
-        categories.add("Services");
-        categories.add("Recreation");
-        //categoriesDrawerList = (ListView) findViewById(R.id.right_drawer);        
-
-
-        // Set the adapter for the list view
-//		CatDrawerArrayAdapter adapter2 = new CatDrawerArrayAdapter(this, categories);
-//        categoriesDrawerList.setAdapter(adapter2);
-        // Set the list's click listener
-//        categoriesDrawerList.setOnItemClickListener(new CatDrawerItemClickListener());
-
-		coupons = new ArrayList<CouponObject>();
-		usedCoupons = new ArrayList<CouponObject>();
-		unsyncedCoupons = new ArrayList<CouponObject>();
-		
-		db = new DBAdapter(this);
-		
-		executeSearch = true;		   
-		
+	
 		// if a bundle is passed in, then this activity was launched by mapActivity infoWindo click
 		//   so we need to start with coupons filtered
 		Intent intent = getIntent();
 		Bundle b = intent.getExtras();
 		if( b != null )
 		{
-			filterCompany = b.getString("companyName");
-			executeSearch = false;
+//			filterCompany = b.getString("companyName");
+//			executeSearch = false;
 
 			// change execute search button to clear
 			// TODO?
@@ -303,16 +219,12 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		Log.d(TAG, "In onStart");
 		super.onStart();
 		
-		Intent locService = new Intent(this, LocationService.class);
-		bindService(locService, mConnection, Context.BIND_AUTO_CREATE);
-		
 		FlurryAgent.onStartSession(this, "J9WHX3VYHPRX8K756WTJ");
 	}
 	@Override
 	public void onStop() {
 		Log.d(TAG, "in onStop of BrowseCouponsActivity");
 		super.onStop();
-		unbindService(mConnection);
 		
 		FlurryAgent.onEndSession(this);
 	}
@@ -365,9 +277,8 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	    			public boolean onClose()
 	    			{
 	    				Log.d(TAG, "In onClose of OnCloseListener() for the searchView Widget");
-	    				executeSearch = true;
-	    				refreshCouponListFromDB();
-	    				drawCouponList();
+//	    				executeSearch = true;
+	    				// TODO:  Pop up a separate fragment/activity with search results?
 	    				return true;
 	    			}
 	    		});
@@ -382,9 +293,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 					public boolean onMenuItemActionCollapse(MenuItem item) {
 						//
 						Log.d(TAG, "Search view collapsed.  Clear search.");
-						executeSearch = true;
-						refreshCouponListFromDB();
-						drawCouponList();
+//						executeSearch = true;
 						return true;
 					}
 		
@@ -418,11 +327,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	        mDrawerLayout = (DrawerLayout) findViewById(R.id.browse_coupons_w_sidebars);
 	        mDrawerLayout.openDrawer(Gravity.LEFT);
 	      break;
-	    // action with ID open right drawer was selected
-	    case R.id.show_categories:
-	      Toast.makeText(this, "Categories selected", Toast.LENGTH_SHORT).show();
-	      break;
-		// action with ID search was selected
+	    // action with ID search was selected
 		case R.id.action_search:
 		  //Toast.makeText(this, "Search selected", Toast.LENGTH_SHORT).show();
 			// nothing to do here. also, listener set above can also handle opening the search view
@@ -437,9 +342,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
-		
-		unregisterReceiver( locationReceiver );
-
 		Log.d(TAG, "In onPause()");
 	}
 	
@@ -447,13 +349,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	public void onResume() {
 		super.onResume();		
 		
-		if( locationReceiver != null )
-		{
-			IntentFilter intentFilter = new IntentFilter(LocationService.BROADCAST_NEW_LOCATION);
-			registerReceiver(locationReceiver, intentFilter);
-		}
-		
-		refreshActivity();
 	}
 
 	@Override
@@ -467,33 +362,31 @@ public class BrowseCouponsActivity extends FragmentActivity {
 
     	    Log.d(TAG, "Searched for "+query);
     	    	
-    	    if( executeSearch )
-	  		{
-    	    	Log.d(TAG, "executeSearch was true");
-	  			filterCompany = query;
-	  		
-	  			// change execute search button to clear
-	  			//searchButton.setText("Clear");
-	  			executeSearch = false; // not sure if we need this any more - need to figure out how to "clear" searches
-	  		
-	  			refreshCouponListFromDBFilteredByCompany( filterCompany );
-	  		}
-	  		else // clearing previously done search
-	  		{
-
-    	    	Log.d(TAG, "executeSearch was false");
-	  			// change execute search button to clear
-	  			//searchButton.setText("Go");
-	  			executeSearch = true;			
-	  			// clear text in search box 
-	  			//searchBox.setText("");
-	  
-	  			refreshCouponListFromDB();
-	  		}
+//    	    if( executeSearch )
+//	  		{
+//    	    	Log.d(TAG, "executeSearch was true");
+//	  			filterCompany = query;
+//	  		
+//	  			// change execute search button to clear
+//	  			//searchButton.setText("Clear");
+//	  			executeSearch = false; // not sure if we need this any more - need to figure out how to "clear" searches
+//	  		
+//	  			// TODO: how to implement search?
+//	  		}
+//	  		else // clearing previously done search
+//	  		{
+//
+//    	    	Log.d(TAG, "executeSearch was false");
+//	  			// change execute search button to clear
+//	  			//searchButton.setText("Go");
+//	  			executeSearch = true;			
+//	  			// clear text in search box 
+//	  			//searchBox.setText("");
+//	  
+//	  		}
     	    
-	  		drawCouponList();
 
-    	    }
+    	   }
 	}
 	
 	private class NavDrawerItemClickListener implements ListView.OnItemClickListener {
@@ -524,438 +417,15 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	    }
 	}
 	
-	private class CatDrawerItemClickListener implements ListView.OnItemClickListener {
-	    @Override
-	    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-	    	Log.d(TAG, "Clicked on item number "+position+" in the navigation drawer");
-			Log.d(BrowseCouponsActivity.TAG, "Should filter to: "+categories.get(position).toString()+".");
-	        //selectItem(position);
-	    	switch (position)
-	    	{
-	    		case 0:
-	    			break;
-	    		case 1:
-	    			break;
-	    		case 2:
-	    			break;
-	    		case 3:
-	    			break;
-	    		case 4:
-	    			break;
-	    		case 5:
-	    			break;
-	    		default:
-	    			Log.d(BrowseCouponsActivity.TAG, "Error: navigation drawer item listener hit default case");
-			}
-	    }
-	}
-	
-	private void refreshActivity() {
-		return;
-//		TryToGetLocation();
-//		
-//		if( !executeSearch && filterCompany != null )
-//		{
-//			if( !refreshCouponListFromDBFilteredByCompany(filterCompany) )
-//			{
-//				// TODO: report a toast error - none found?
-//				refreshCouponListFromDB();
-//			}
-//		}
-//		else
-//		{
-//			refreshCouponListFromDB();
-//		}
-		
-//		if( useLocations )
-//		{
-//			sortByNearest( findViewById(R.id.sort_by_nearest_button));
-//		}
-//		else
-//		{
-//			sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button));
-//		}
-//		drawCouponList();
-//		CallSyncCoupons();
-//		CallSyncRecvdCoupons();
-	}
-	
-	private void TryToGetLocation() {
-		
-		if( mBound )
-		{
-			Location newLocation = locationService.getCurrentLocation();
-			if( newLocation != null )
-			{
-				Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity.TryToGetLocation: getCurrentLocation not null");
-				currentLocation = new Location(locationService.getCurrentLocation());
-				useLocations = true;
-			}
-			else
-			{
-				Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity.TryToGetLocation: getCurrentLocation = null");
-				useLocations = false;
-			}
-		}
-		else
-		{
-			Log.d(LocationService.LOCATION_SERVICE, "in BrowseActivity.TryToGetLocation: mBound is false");
-		}
-	}
 	
 	public void onGetNewCouponsButtonClicked(View view) { // warning: do not use the "view" paramater being passed in. It is given as null when option in nav drawer chosen
 		Intent intent = new Intent( this, SearchNewCouponsActivity.class );
     	startActivity( intent );	
 	}
 	
-	public void useCouponConfirmed( int position ) {
-		
-		if( position == -1 )
-		{
-			Log.d( TAG, "ERROR: Got a confirmation of using coupon in position -1 in useCouponConfirmed() in BrowseCouponsActivity.java ");
-			return;
-		}
-		// user clicked "yes" in alert dialog asking if they want to use the coupon
-		//   we need to remove the coupon from the list
-
-		Log.d(BrowseCouponsActivity.TAG, "in useCouponConfirmed()...position = "+position);
-		
-		// mark coupon used in database...this function updates the DATE_USED field
-		db.open();
-		if( !db.markCouponUsed(coupons.get(position).getRowId()) )
-		{
-			Log.d(BrowseCouponsActivity.TAG, "markCouponUsed returned an error");
-			db.close();
-		}
-		else
-		{
-			db.close();
-			CallSyncCoupons();
-		}
-		
-		coupons.remove(position);
-		
-		drawCouponList();
-	}
 	
-	public void refreshCouponListFromDB() {
-		Log.d(TAG, "in refreshCouponListFromDB()");
-		TryToGetLocation();
-		db.open();
-		Cursor c = db.getAllUnusedCoupons();
 
-		coupons.clear();
-
-		if( c.moveToFirst() ) // at least one row was returned
-		{
-			do
-			{
-				Log.d(BrowseCouponsActivity.TAG, "rowId = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));	
-				Log.d(BrowseCouponsActivity.TAG, "company name = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)));
-				Log.d(BrowseCouponsActivity.TAG, "coupon details = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)));
-				
-				boolean favorite;
-				int fav = c.getInt(c.getColumnIndex(DBAdapter.KEY_FAVORITE));
-				if( fav == 0 )
-				{
-					favorite = false;
-				}
-				else
-				{
-					favorite = true;
-				}
-				Log.d(BrowseCouponsActivity.TAG, "favorites = " + fav );
-				Log.d(BrowseCouponsActivity.TAG, "Exp Date = "+c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)));
-				Log.d(BrowseCouponsActivity.TAG, "Logo = "+c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)));
-				Log.d(BrowseCouponsActivity.TAG, "Date Used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
-
-				double distance = getDistance( 1.0, 1.0 );
-				
-				if( useLocations )
-				{
-					Log.d(LOCATION_TAG, "Finding location for coupon (useLocations = true)");
-				
-					float results[] = {(float) 0.0, (float) 0.0, (float) 0.0};
-					Log.d(TAG, "Current latitude: " + currentLocation.getLatitude() + ", Current longitude: " + currentLocation.getLongitude() );
-					
-					Location.distanceBetween( currentLocation.getLatitude(), currentLocation.getLongitude(), 
-							c.getFloat(c.getColumnIndex(DBAdapter.KEY_LATITUDE)), c.getFloat(c.getColumnIndex(DBAdapter.KEY_LONGITUDE)), results );
-					distance = results[0];
-				}
-				else
-				{
-					Log.d(BrowseCouponsActivity.TAG, "Setting distance for coupon to 0.0 (useLocations = false)");
-					distance = -1.0;
-				}					
-				Log.d(LOCATION_TAG, "Distance = "+distance);
-				
-				//String name, String exp_date, String pic, String detail, 
-				//       boolean fav, int rowid, double dist, int date_used
-				CouponObject newCoup = new CouponObject( c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)),
-						c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)),
-						c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)),
-						c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)),
-						favorite, 
-						c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
-						distance,
-						0); // can simply put 0 for date_used since query only returned coups with this value
-				coupons.add(newCoup);
-			}while( c.moveToNext() );
-		}
-		else
-		{
-			Log.d(BrowseCouponsActivity.TAG, "No coupons in database.");
-		}
-		db.close();		
-	}
-
-	// returns true if successful...returns false if unable to find company that it should be filtering by
-	public boolean refreshCouponListFromDBFilteredByCompany( String CompanyName ) {
-		Log.d(TAG, "in refreshCouponListFromDBFilteredByCompany(" + CompanyName + ")");
-		TryToGetLocation();
-		db.open();
-		Cursor c = db.getAllUnusedCouponsOfCompany( CompanyName );
-
-		coupons.clear();
-
-		if( c.moveToFirst() ) // at least one row was returned
-		{
-			do
-			{
-				Log.d(BrowseCouponsActivity.TAG, "rowId = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));	
-				Log.d(BrowseCouponsActivity.TAG, "company name = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)));
-				Log.d(BrowseCouponsActivity.TAG, "coupon details = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)));
-				
-				boolean favorite;
-				int fav = c.getInt(c.getColumnIndex(DBAdapter.KEY_FAVORITE));
-				if( fav == 0 )
-				{
-					favorite = false;
-				}
-				else
-				{
-					favorite = true;
-				}
-				Log.d(BrowseCouponsActivity.TAG, "favorites = " + fav );
-				Log.d(BrowseCouponsActivity.TAG, "Exp Date = "+c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)));
-				Log.d(BrowseCouponsActivity.TAG, "Logo = "+c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)));
-				Log.d(BrowseCouponsActivity.TAG, "Date Used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
-
-				double distance = getDistance( 1.0, 1.0 );
-				if( useLocations )
-				{
-					Log.d(LOCATION_TAG, "Finding location for coupon (useLocations = true)");
-				
-					float results[] = {(float) 0.0, (float) 0.0, (float) 0.0};
-					Log.d(TAG, "Current latitude: " + currentLocation.getLatitude() + ", Current longitude: " + currentLocation.getLongitude() );
-					
-					Location.distanceBetween( currentLocation.getLatitude(), currentLocation.getLongitude(), 
-							c.getFloat(c.getColumnIndex(DBAdapter.KEY_LATITUDE)), c.getFloat(c.getColumnIndex(DBAdapter.KEY_LONGITUDE)), results );
-					distance = results[0];
-				}
-				else
-				{
-					Log.d(BrowseCouponsActivity.TAG, "Setting distance for coupon to 0.0 (useLocations = false)");
-					distance = -1.0;
-				}					
-				Log.d(LOCATION_TAG, "Distance = "+distance);
-				
-				//String name, String exp_date, String pic, String detail, 
-				//       boolean fav, int rowid, double dist, int date_used
-				CouponObject newCoup = new CouponObject( c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)),
-						c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)),
-						c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)),
-						c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)),
-						favorite, 
-						c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
-						distance,
-						0); // can simply put 0 for date_used since query only returned coups with this value
-				coupons.add(newCoup);
-			}while( c.moveToNext() );
-		}
-		else
-		{
-			Log.d(BrowseCouponsActivity.TAG, "No coupons in database.");
-			return false;
-		}
-		db.close();	
-		return true;
-	}
 	
-	public void drawCouponList() {
-		
-		Log.d(TAG, "in drawCouponList()");
-		
-		switch( sortByValue )
-		{
-			case SORT_BY_NAME:
-				Log.d(TAG,  "Sorting by Name");
-				Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.NAME_SORT) ) );
-				break;
-			case SORT_BY_NEAREST:
-				Log.d(TAG,  "Sorting by Nearest");
-				Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.NEAREST_SORT, CouponComparator.NAME_SORT) ) );
-				break;
-			case SORT_BY_EXP_DATE:
-				Log.d(TAG,  "Sorting by Exp Date");
-				Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.EXP_DATE_SORT, CouponComparator.NAME_SORT) ) );
-				break;
-			default:
-				break;
-		}
-
-		// TODO: Fix search suggestions and implement searching function
-		ArrayList<String> names = new ArrayList<String>();
-		for( int i = 0; i < coupons.size(); i++ )
-		{
-			//if( !names.contains(coupons.get(i).getCouponName()) )
-			//{
-				names.add(coupons.get(i).getCouponName());
-			//}
-		}
-		CouponListArrayAdapter adapter = new CouponListArrayAdapter(this, coupons, names, true);
-		TextView noCoupsMessage = (TextView)findViewById(R.id.noCouponsMessage);
-		Button getNewCoupsButton = (Button)findViewById(R.id.getNewCouponsButton);
-
-		if( coupons.isEmpty() )
-		{
-			Log.d(TAG, "No coupons to draw");
-			ListView list = (ListView)findViewById(R.id.couponList);
-			list.setAdapter(null);
-			noCoupsMessage.setText(R.string.no_coupons_message);
-			noCoupsMessage.bringToFront();
-			noCoupsMessage.setVisibility(View.VISIBLE);
-			getNewCoupsButton.setVisibility(View.VISIBLE);
-			getNewCoupsButton.setClickable(true);
-			getNewCoupsButton.bringToFront();
-			return;
-		}
-		else
-		{
-			noCoupsMessage.setVisibility(View.GONE);
-			getNewCoupsButton.setVisibility(View.GONE);
-		}
-		
-		ListView list = (ListView)findViewById(R.id.couponList);
-		list.setAdapter(adapter);
-		list.setOnItemClickListener(new OnItemClickListener() {
-		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-		    	String imageName = coupons.get(position).getCouponPic();
-		    	String companyName = coupons.get(position).getCouponName();
-		    	String couponDetail = coupons.get(position).getCouponDetail();
-
-		        Intent coupDisplayIntent = new Intent(v.getContext(), CouponDisplayActivity.class);
-		        Bundle b = new Bundle();
-		        b.putString("couponPic", imageName);
-		        b.putInt("position", position);
-		        b.putString("companyName", companyName);
-		        b.putString("couponDetail", couponDetail);
-		        b.putBoolean("usable", true);
-		        coupDisplayIntent.putExtras(b);
-		        
-		        // Capture author info & user status
-		        Map<String, String> couponParams = new HashMap<String, String>();
-		 
-		        couponParams.put("companyName", companyName); 
-		        couponParams.put("couponDetail", couponDetail); 
-		        FlurryAgent.logEvent("couponViewed", couponParams);
-
-		        startActivityForResult( coupDisplayIntent, use_coup_request_Code );
-		    }
-		});
-		
-//		AutoCompleteTextView editBox = (AutoCompleteTextView) findViewById( R.id.coupon_search_text_box );
-//		ArrayAdapter<String> searchSuggAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);
-//		editBox.setAdapter(searchSuggAdapter);
-		
-		return;
-	}
-	
-	public void onActivityResult( int requestCode, int resultCode, Intent data ) 
-	{
-		Log.d(BrowseCouponsActivity.TAG, "Entered OnActivityResult():");
-		//super.onActivityResult( requestCode,  resultCode,  data );
-		if( requestCode == use_coup_request_Code )
-		{
-			if( resultCode == RESULT_OK )
-			{
-				int pos = data.getIntExtra("position", 0);
-				int rowId = -1;
-				Log.d(BrowseCouponsActivity.POSITION_TAG, "OnActivityResult() in BrowseCouponsActivity...position = "+pos);
-				if( pos != -1 )
-				{
-					rowId = coupons.get(pos).getRowId();
-					Log.d(BrowseCouponsActivity.POSITION_TAG, "OnActivityResult() in BrowseCouponsActivity...rowId = "+rowId);
-					useCouponConfirmed( pos );
-				}
-			}
-		}
-		//refreshCouponListFromDB();
-		//drawCouponList();
-	}
-	
-//	public void sortByNearest( View view ) {
-//		if( !useLocations )
-//		{
-//			displayCannotFindLocToast();
-//			sortByEndingSoon( findViewById(R.id.sort_by_ending_soon_button) );
-//			return;
-//		}
-//		view.setSelected(true);
-//		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
-//		b1.setSelected(false);
-//		Button b2 = (Button) findViewById(R.id.sort_by_az_button);
-//		b2.setSelected(false);
-//		Button b3 = (Button) findViewById(R.id.go_to_map_button);
-//		b3.setSelected(false);
-//		
-//		sortByValue = SortByValueEnum.SORT_BY_NEAREST;
-//		drawCouponList();
-//	}
-//	
-//	
-//	public void sortByEndingSoon( View view ) {
-//		view.setSelected(true);
-//		Button b1 = (Button) findViewById(R.id.sort_by_nearest_button);
-//		b1.setSelected(false);
-//		Button b2 = (Button) findViewById(R.id.sort_by_az_button);
-//		b2.setSelected(false);
-//		Button b3 = (Button) findViewById(R.id.go_to_map_button);
-//		b3.setSelected(false);
-//
-//		sortByValue = SortByValueEnum.SORT_BY_EXP_DATE;
-//		drawCouponList();
-//	}
-//	
-//	public void sortAlphabetically( View view ) {
-//		view.setSelected(true);
-//		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
-//		b1.setSelected(false);
-//		Button b2 = (Button) findViewById(R.id.sort_by_nearest_button);
-//		b2.setSelected(false);
-//		Button b3 = (Button) findViewById(R.id.go_to_map_button);
-//		b3.setSelected(false);
-//
-//		sortByValue = SortByValueEnum.SORT_BY_NAME;
-//		drawCouponList();
-//	}
-//	
-//	public void goToMap( View view ) {
-//		view.setSelected(true);
-//		Button b1 = (Button) findViewById(R.id.sort_by_ending_soon_button);
-//		b1.setSelected(false);
-//		Button b2 = (Button) findViewById(R.id.sort_by_nearest_button);
-//		b2.setSelected(false);
-//		Button b3 = (Button) findViewById(R.id.sort_by_az_button);
-//		b3.setSelected(false);
-//		Intent intent = new Intent( this, MapActivity.class );
-//		startActivity(intent);
-//	}
-	
-	public double getDistance( double loc1, double loc2 )
-	{
-		return 0.0;
-	}
 	
 	public void displayCannotFindLocToast() {
 		Toast.makeText(getApplicationContext(), "Cannot find current location.", Toast.LENGTH_LONG).show();
@@ -1005,112 +475,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	}
 
 	
-	private BroadcastReceiver locationReceiver = new BroadcastReceiver() {
-
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			// received new location from location service
-			Log.d(TAG, "In BrowseCouponsActivity BroadcastReceiver...got new location");
-			if( mBound )
-			{
-				TryToGetLocation();
-			}
-		}
-		
-	};
-	
-	private void CallSyncCoupons() 
-	{
-		if( IsConnected() ) {
-			// go ahead and push coupon use back to server database
-			db.open();
-			Cursor c = db.getUsedCoupons();
-			
-			usedCoupons.clear();
-			if( c.moveToFirst() ) // at least one row was returned
-			{
-				do
-				{					
-					boolean favorite;
-					int fav = c.getInt(c.getColumnIndex(DBAdapter.KEY_FAVORITE));
-					if( fav == 0 )
-					{
-						favorite = false;
-					}
-					else
-					{
-						favorite = true;
-					}
-					CouponObject newCoup = new CouponObject( "",//c.getString(c.getColumnIndex(KEY_COUPON_NAME)),
-							"",//c.getString(c.getColumnIndex(KEY_EXP_DATE)),
-							"",//c.getString(c.getColumnIndex(KEY_FILE_URL)),
-							"",//c.getString(c.getColumnIndex(KEY_DETAILS_NAME)),
-							favorite, 
-							c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
-							0, //distance,
-							c.getInt( c.getColumnIndex(DBAdapter.KEY_DATE_USED)  ) ); // can simply put 0 for date_used since query only returned coups with this value
-					usedCoupons.add(newCoup);
-					
-					//Log.d(TAG, "USED COUPON: event_id = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));
-					//Log.d(TAG, "USED COUPON: date_used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
-				}while( c.moveToNext() );
-				db.close();
-				CouponObject[] usedCoups = new CouponObject[usedCoupons.size()];
-				usedCoups = usedCoupons.toArray(usedCoups);
-				new SyncUsedCoupons().execute(usedCoups);
-			}
-			else
-			{
-				db.close();
-				Log.d(BrowseCouponsActivity.TAG, "No used coupons in database.");
-			}
-		}
-		else
-		{
-			// sync later
-		}
-	}	
-	private void CallSyncRecvdCoupons() 
-	{
-		if( IsConnected() ) {
-			// go ahead and push coupon use back to server database
-			db.open();
-			Cursor c = db.getUnsyncedCoupons();
-			
-			unsyncedCoupons.clear();
-			if( c.moveToFirst() ) // at least one row was returned
-			{
-				do
-				{					
-					CouponObject newCoup = new CouponObject( "",//c.getString(c.getColumnIndex(KEY_COUPON_NAME)),
-							"",//c.getString(c.getColumnIndex(KEY_EXP_DATE)),
-							"",//c.getString(c.getColumnIndex(KEY_FILE_URL)),
-							"",//c.getString(c.getColumnIndex(KEY_DETAILS_NAME)),
-							false, 
-							c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
-							0, //distance,
-							0 ); // can simply put 0 for date_used since query only returned coups with this value
-					unsyncedCoupons.add(newCoup);
-					
-					Log.d(TAG, "UNSYNCED COUPON: event_id = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));
-				}while( c.moveToNext() );
-				db.close();
-				CouponObject[] unsyncedCoups = new CouponObject[unsyncedCoupons.size()];
-				unsyncedCoups = unsyncedCoupons.toArray(unsyncedCoups);
-				new SyncRecvdCoupons().execute(unsyncedCoups);
-			}
-			else
-			{
-				db.close();
-				Log.d(BrowseCouponsActivity.TAG, "No unsynced coupons in database.");
-			}
-		}
-		else
-		{
-			// sync later
-		}
-	}
-	
 	private boolean IsConnected() {
 
 		ConnectivityManager conMgr = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -1120,211 +484,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 		
 	}
 	
-	private class SyncUsedCoupons extends AsyncTask<CouponObject, Integer, Boolean>{
-		
-		@Override
-		protected Boolean doInBackground( CouponObject...couponObjects ) {
-			Log.d(TAG, "In SyncUsedCoupons: ");
-			for( int i = 0; i < couponObjects.length; i++ )
-			{
-				Log.d(TAG, "Coupon event_id = "+couponObjects[i].getRowId()+", date_used = "+couponObjects[i].getDateUsed());
-			}
-			SharedPreferences prefs = getSharedPreferences(MainActivity.PREFS_FILE, 0);
-			JSONArray coupons = new JSONArray();
-			JSONObject user = new JSONObject();
-			try {
-				user.put("username", prefs.getString(LoginActivity.USERNAME, ""));
-				for( int i = 0; i < couponObjects.length; i++ )
-				{
-					JSONObject coup = new JSONObject();
-					coup.put("event_id", couponObjects[i].getRowId());
-					coup.put("was_favorite", couponObjects[i].getFavorite());
-					coup.put("date_used", couponObjects[i].getDateUsed());
-					coupons.put(coup);
-				}
-				user.put("coupons", coupons);
-			} catch (JSONException e1 ) {
-				e1.printStackTrace();
-			}
-			
-			try {
-			// need to send json object "user" to server  
-			HttpParams httpParams = new BasicHttpParams();
-	        HttpConnectionParams.setConnectionTimeout(httpParams,
-	                10000);
-	        HttpConnectionParams.setSoTimeout(httpParams, 10000);
-			HttpClient client = new DefaultHttpClient(httpParams);
-			HttpPost request = new HttpPost("http://166.78.251.32/gnt/update_used_coupons.php");
-		        request.setHeader("json", user.toString());
-		        //Log.d(TAG, "JSON Object = "+user.toString());
-		        request.getParams().setParameter("jsonpost", user);
-		        HttpResponse response = client.execute(request);
-		        HttpEntity entity = response.getEntity();
-		        if (entity != null) {
-		            InputStream is = entity.getContent();
-		            BufferedInputStream in;
-					if( is != null )
-					{
-						Log.d(TAG, "got input stream from urlConnection");
-						in = new BufferedInputStream(is);
-					}
-					else
-					{
-						Log.d(TAG, "urlConnection.getInputStream() failed");
-						return null;
-					}
-			        Log.d(TAG, "got input stream");
-		         
-		            ByteArrayBuffer baf = new ByteArrayBuffer(500);
-		            int current = 0;
-		            while( (current = in.read()) != -1 ) {
-		            	baf.append((byte) current);
-		            	//Log.d(TAG, "byte = "+current);
-		            }
-		            in.close();
-		            Log.d(TAG, "BAF: "+baf.toString());
-		            JSONObject json = new JSONObject(new String(baf.toByteArray(), "utf-8"));
-		            //JSONObject json = new JSONObject(new String(baf.toString()));
-
-		            Log.d(TAG, "Created JSON return object");
-//		            String temp = json.getString("error");
-//		            Log.d(TAG, "error string returned = "+temp);
-		            if( json.getString("error").equals("none") )
-		            //if( json.getBoolean("success") )
-		            {
-		            	db.open();
-		            	Log.d(TAG, "Successful update...should delete from local database.");
-		            	for( int i = 0; i < couponObjects.length; i++ )
-						{ 
-							int rowId = couponObjects[i].getRowId();
-							Log.d(TAG, "Trying to delete coupon with event_id = "+rowId);
-							
-							if( !db.deleteCoupon(rowId) )
-							{
-								Log.d(TAG, "Failure updating local database (deleting coupon that was used and synced)");
-							}
-							else
-							{
-								Log.d(TAG, "Succesfully updated local database: deleted coupon with event_id = "+rowId);
-							}
-						}
-		            	db.close();
-		            }
-		            else
-		            {
-		            	Log.d(TAG, "Error updating database in server trying to sync used coupons.");
-		            }
-		            //String result = EntityUtils.toString(entity);
-		            //Log.d(TAG, "Read from server:" + result);
-		        }
-			} catch (Throwable t) {
-				Log.d(TAG,  "Error in the Http Request somewhere trying to sync used coupons.");
-				t.printStackTrace();
-			}
-			return false;
-		}
-
-		
-	}
-	
-	
-	private class SyncRecvdCoupons extends AsyncTask<CouponObject, Integer, Boolean>{
-		
-		@Override
-		protected Boolean doInBackground( CouponObject...couponObjects ) {
-			Log.d(TAG, "In SyncRecvdCoupons: ");
-			SharedPreferences prefs = getSharedPreferences(MainActivity.PREFS_FILE, 0);
-			JSONArray coupons = new JSONArray();
-			JSONObject user = new JSONObject();
-			try {
-				user.put("username", prefs.getString(LoginActivity.USERNAME, ""));
-				for( int i = 0; i < couponObjects.length; i++ )
-				{
-					JSONObject coup = new JSONObject();
-					coup.put("event_id", couponObjects[i].getRowId());
-					coupons.put(coup);
-				}
-				user.put("coupons", coupons);
-			} catch (JSONException e1 ) {
-				e1.printStackTrace();
-			}
-			
-			try {
-			// need to send json object "user" to server  
-			HttpParams httpParams = new BasicHttpParams();
-	        HttpConnectionParams.setConnectionTimeout(httpParams,
-	                10000);
-	        HttpConnectionParams.setSoTimeout(httpParams, 10000);
-			HttpClient client = new DefaultHttpClient(httpParams);
-			HttpPost request = new HttpPost("http://166.78.251.32/gnt/update_synced_coupons.php");
-			//StringEntity se = new StringEntity(user.toString());
-			//request.setEntity(se);
-			//request.setEntity(new ByteArrayEntity(user.toString().getBytes("UTF8")));
-		        request.setHeader("json", user.toString());
-		        request.getParams().setParameter("jsonpost", user);
-		        HttpResponse response = client.execute(request);
-		        HttpEntity entity = response.getEntity();
-		        if (entity != null) {
-		            InputStream is = entity.getContent();
-		            BufferedInputStream in;
-					if( is != null )
-					{
-						Log.d(TAG, "got input stream from urlConnection");
-						in = new BufferedInputStream(is);
-					}
-					else
-					{
-						Log.d(TAG, "urlConnection.getInputStream() failed");
-						return null;
-					}
-			        Log.d(TAG, "got input stream");
-		         
-		            ByteArrayBuffer baf = new ByteArrayBuffer(500);
-		            int current = 0;
-		            while( (current = in.read()) != -1 ) {
-		            	baf.append((byte) current);
-		            	//Log.d(TAG, "byte = "+current);
-		            }
-		            in.close();
-		            Log.d(TAG, "BAF: "+baf.toString());
-		            JSONObject json = new JSONObject(new String(baf.toByteArray(), "utf-8"));
-
-		            if( json.getString("error").equals("none") )
-		            {
-		            	db.open();
-		            	Log.d(TAG, "Successful update...should delete from local database.");
-		            	for( int i = 0; i < couponObjects.length; i++ )
-						{
-							int rowId = couponObjects[i].getRowId();
-							Log.d(TAG, "Trying to delete coupon with event_id = "+rowId);
-							
-							if( !db.markCouponSynced(rowId) )
-							{
-								Log.d(TAG, "Failure updating local database (not able to tell server that coupon was recieved)");
-							}
-							else
-							{
-								Log.d(TAG, "Succesfully updated local database: marked received: coupon with event_id = "+rowId);
-							}
-						}
-		            	db.close();
-		            }
-		            else
-		            {
-		            	Log.d(TAG, "Error updating database in server.");
-		            }
-		            //String result = EntityUtils.toString(entity);
-		            //Log.d(TAG, "Read from server:" + result);
-		        }
-			} catch (Throwable t) {
-				Log.d(TAG,  "Error in the Http Request somewhere.");
-				t.printStackTrace();
-			}
-			return false;
-		}	
-	}
-	
-
     public static class CouponListPagerAdapter extends FragmentStatePagerAdapter {
         public CouponListPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -1342,11 +501,28 @@ public class BrowseCouponsActivity extends FragmentActivity {
     }
 
     public static class CouponListFragment extends ListFragment {
+
+        public static final String TAG = "couponlistfragment";
         int mNum;
         private ArrayList<CouponObject> coupons;
-        private int use_coup_request_Code = 1;
+        private ArrayList<CouponObject> usedCoupons;
+        private ArrayList<CouponObject> unsyncedCoupons;
+        
    	 	private DBAdapter db;
    	 	private Random r;
+   		LocationServiceBinder binder;
+   		
+   		private LocationService locationService;
+   		//private LocationListener locationListener;
+   		private Location currentLocation;
+   		private boolean useLocations = false;
+
+    	private int use_coup_request_Code = 1;
+
+   		// if true, button to right of search bar executes search, otherwise, it clears the search
+   		//   button text(background) will be set to proper value
+   		private boolean executeSearch;
+   		private String filterCompany;
 
    	 	private static SortByValueEnum sortByValue = SortByValueEnum.SORT_BY_NEAREST;
         
@@ -1371,6 +547,14 @@ public class BrowseCouponsActivity extends FragmentActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
+            
+            Log.d(TAG, "in onCreate() of CouponListFragment");
+            
+            db = new DBAdapter(getActivity());
+            coupons = new ArrayList<CouponObject>();        
+            usedCoupons = new ArrayList<CouponObject>();
+    		unsyncedCoupons = new ArrayList<CouponObject>();
+
             mNum = getArguments() != null ? getArguments().getInt("num") : 1;
 	   	     switch( mNum )
 	   	     {
@@ -1388,8 +572,40 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	   		    	 break;
 	   	     }
             r = new Random();
+            
+            refreshCouponListFromDB();
         }
 
+    	@Override
+    	public void onStart() {
+    		Log.d(TAG, "In onStart");
+    		super.onStart();
+    		
+//    		Intent locService = new Intent(getBaseContext(), LocationService.class);
+//    		bindService(locService, mConnection, Context.BIND_AUTO_CREATE);
+    		
+    	}
+    	
+    	@Override
+    	public void onStop() {
+    		Log.d(TAG, "in onStop of BrowseCouponsActivity");
+    		super.onStop();
+ //   		unbindService(mConnection);
+    		
+    	}
+    	    	
+    	@Override
+    	public void onResume() {
+    		super.onResume();		
+    		
+//    		if( locationReceiver != null )
+//    		{
+//    			IntentFilter intentFilter = new IntentFilter(LocationService.BROADCAST_NEW_LOCATION);
+//    			registerReceiver(locationReceiver, intentFilter);
+//    		}
+    		
+    		refreshActivity();
+    	}
         /**
          * The Fragment's UI is just a simple text view showing its
          * instance number.
@@ -1398,10 +614,7 @@ public class BrowseCouponsActivity extends FragmentActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                 Bundle savedInstanceState) {
             View v = inflater.inflate(R.layout.coupon_list, container, false);
-            
-            db = new DBAdapter(getActivity());
-            coupons = new ArrayList<CouponObject>();
-            refreshCouponListFromDB();
+
 			switch( sortByValue )
 			{
 				case SORT_BY_NAME:
@@ -1430,7 +643,6 @@ public class BrowseCouponsActivity extends FragmentActivity {
 			CouponListArrayAdapter adapter = new CouponListArrayAdapter(getActivity(), coupons, names, true);
 			setListAdapter(adapter);
             
-            
             return v;
         }
 
@@ -1438,10 +650,111 @@ public class BrowseCouponsActivity extends FragmentActivity {
         public void onActivityCreated(Bundle savedInstanceState) {
             super.onActivityCreated(savedInstanceState);
         }
+        public void drawCouponList() {
+    		
+    		Log.d(TAG, "in drawCouponList()");
+    		
+    		switch( sortByValue )
+    		{
+    			case SORT_BY_NAME:
+    				Log.d(TAG,  "Sorting by Name");
+    				Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.NAME_SORT) ) );
+    				break;
+    			case SORT_BY_NEAREST:
+    				Log.d(TAG,  "Sorting by Nearest");
+    				Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.NEAREST_SORT, CouponComparator.NAME_SORT) ) );
+    				break;
+    			case SORT_BY_EXP_DATE:
+    				Log.d(TAG,  "Sorting by Exp Date");
+    				Collections.sort( coupons, CouponComparator.descending( CouponComparator.getComparator(CouponComparator.EXP_DATE_SORT, CouponComparator.NAME_SORT) ) );
+    				break;
+    			default:
+    				break;
+    		}
+
+            ArrayList<String> names = new ArrayList<String>();
+			for( int i = 0; i < coupons.size(); i++ )
+			{
+				//if( !names.contains(coupons.get(i).getCouponName()) )
+				//{
+					names.add(coupons.get(i).getCouponName());
+				//}
+			}
+			CouponListArrayAdapter adapter = new CouponListArrayAdapter(getActivity(), coupons, names, true);
+			setListAdapter(adapter);
+			
+//    		// TODO: Fix search suggestions and implement searching function
+//    		ArrayList<String> names = new ArrayList<String>();
+//    		for( int i = 0; i < coupons.size(); i++ )
+//    		{
+//    			//if( !names.contains(coupons.get(i).getCouponName()) )
+//    			//{
+//    				names.add(coupons.get(i).getCouponName());
+//    			//}
+//    		}
+//    		Context context = getActivity();
+//    		CouponListArrayAdapter adapter = new CouponListArrayAdapter(context, coupons, names, true);
+//    		TextView noCoupsMessage = (TextView)getView().findViewById(R.id.noCouponsMessage);
+//    		Button getNewCoupsButton = (Button)getView().findViewById(R.id.getNewCouponsButton);
+
+    		if( coupons.isEmpty() )
+    		{
+    			Log.d(TAG, "No coupons to draw");
+//    			ListView list = (ListView)getView().findViewById(R.id.couponList);
+//    			list.setAdapter(null);
+//    			noCoupsMessage.setText(R.string.no_coupons_message);
+//    			noCoupsMessage.bringToFront();
+//    			noCoupsMessage.setVisibility(View.VISIBLE);
+//    			getNewCoupsButton.setVisibility(View.VISIBLE);
+//    			getNewCoupsButton.setClickable(true);
+//    			getNewCoupsButton.bringToFront();
+    			return;
+    		}
+    		// TODO:: What to do when no coupons?
+//    		else
+//    		{
+//    			noCoupsMessage.setVisibility(View.GONE);
+//    			getNewCoupsButton.setVisibility(View.GONE);
+//    		}
+    		
+//    		ListView list = (ListView)getView().findViewById(R.id.couponList);
+//    		list.setAdapter(adapter);
+//    		list.setOnItemClickListener(new OnItemClickListener() {
+//    		    public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+//    		    	String imageName = coupons.get(position).getCouponPic();
+//    		    	String companyName = coupons.get(position).getCouponName();
+//    		    	String couponDetail = coupons.get(position).getCouponDetail();
+//
+//    		        Intent coupDisplayIntent = new Intent(v.getContext(), CouponDisplayActivity.class);
+//    		        Bundle b = new Bundle();
+//    		        b.putString("couponPic", imageName);
+//    		        b.putInt("position", position);
+//    		        b.putString("companyName", companyName);
+//    		        b.putString("couponDetail", couponDetail);
+//    		        b.putBoolean("usable", true);
+//    		        coupDisplayIntent.putExtras(b);
+//    		        
+//    		        // Capture author info & user status
+//    		        Map<String, String> couponParams = new HashMap<String, String>();
+//    		 
+//    		        couponParams.put("companyName", companyName); 
+//    		        couponParams.put("couponDetail", couponDetail); 
+//    		        FlurryAgent.logEvent("couponViewed", couponParams);
+//
+//    		        startActivityForResult( coupDisplayIntent, use_coup_request_Code );
+//    		    }
+//    		});
+    		
+//    		AutoCompleteTextView editBox = (AutoCompleteTextView) findViewById( R.id.coupon_search_text_box );
+//    		ArrayAdapter<String> searchSuggAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, names);
+//    		editBox.setAdapter(searchSuggAdapter);
+    		
+    		return;
+    	}
 
         @Override
         public void onListItemClick(ListView l, View v, int position, long id) {
-            Log.i("FragmentList", "Item clicked: " + id);
+            Log.i("CouponList", "Item clicked: " + id);
             String imageName = coupons.get(position).getCouponPic();
 	    	String companyName = coupons.get(position).getCouponName();
 	    	String couponDetail = coupons.get(position).getCouponDetail();
@@ -1465,6 +778,92 @@ public class BrowseCouponsActivity extends FragmentActivity {
 	        startActivityForResult( coupDisplayIntent, use_coup_request_Code );
 
         }
+
+    	public void onActivityResult( int requestCode, int resultCode, Intent data ) 
+    	{
+    		Log.d(TAG, "Entered OnActivityResult():");
+    		Log.d(TAG, "requestCode = "+requestCode+", resultCode = "+resultCode);
+    		//super.onActivityResult( requestCode,  resultCode,  data );
+    		if( requestCode == use_coup_request_Code )
+    		{
+    			if( resultCode == RESULT_OK )
+    			{
+    				int pos = data.getIntExtra("position", 0);
+    				int rowId = -1;
+    				Log.d(BrowseCouponsActivity.POSITION_TAG, "OnActivityResult() in BrowseCouponsActivity...position = "+pos);
+    				if( pos != -1 )
+    				{
+    					rowId = coupons.get(pos).getRowId();
+    					Log.d(BrowseCouponsActivity.POSITION_TAG, "OnActivityResult() in BrowseCouponsActivity...rowId = "+rowId);
+    					useCouponConfirmed( pos );
+    				}
+    			}
+    			else
+    			{
+    				Log.d(TAG, "resultCode != RESULT_OK");
+    			}
+    		}
+    		refreshCouponListFromDB();
+    		drawCouponList();
+    		
+    	}
+    	
+    	public void useCouponConfirmed( int position ) {
+    		
+    		if( position == -1 )
+    		{
+    			Log.d( TAG, "ERROR: Got a confirmation of using coupon in position -1 in useCouponConfirmed() in BrowseCouponsActivity.java ");
+    			return;
+    		}
+    		// user clicked "yes" in alert dialog asking if they want to use the coupon
+    		//   we need to remove the coupon from the list
+
+    		Log.d(TAG, "in useCouponConfirmed()...position = "+position);
+    		
+    		// mark coupon used in database...this function updates the DATE_USED field
+    		db.open();
+    		if( !db.markCouponUsed(coupons.get(position).getRowId()) )
+    		{
+    			Log.d(TAG, "markCouponUsed returned an error");
+    			db.close();
+    		}
+    		else
+    		{
+    			db.close();
+    			CallSyncCoupons();
+    		}
+    		
+    		coupons.remove(position);
+    		
+    		drawCouponList();
+    	}
+		
+    	public double getDistance( double loc1, double loc2 )
+    	{
+    		return 0.0;
+    	}
+    	
+    	private void refreshActivity() {
+    		TryToGetLocation();
+    		
+    		if( !executeSearch && filterCompany != null )
+    		{
+    			if( !refreshCouponListFromDBFilteredByCompany(filterCompany) )
+    			{
+    				// TODO: report a toast error - none found?
+    				refreshCouponListFromDB();
+    			}
+    		}
+    		else
+    		{
+    			refreshCouponListFromDB();
+    		}
+    		
+    		drawCouponList();
+    		CallSyncCoupons();
+    		CallSyncRecvdCoupons();
+    	}
+        
         public void refreshCouponListFromDB() {
 			Log.d(TAG, "in refreshCouponListFromDB()");
 			//TryToGetLocation();
@@ -1536,7 +935,453 @@ public class BrowseCouponsActivity extends FragmentActivity {
 				Log.d("couponlistfragment", "No coupons in database.");
 			}
 			db.close();		
-		}	
+		}
+    	// returns true if successful...returns false if unable to find company that it should be filtering by
+    	public boolean refreshCouponListFromDBFilteredByCompany( String CompanyName ) {
+    		Log.d(TAG, "in refreshCouponListFromDBFilteredByCompany(" + CompanyName + ")");
+    		TryToGetLocation();
+    		db.open();
+    		Cursor c = db.getAllUnusedCouponsOfCompany( CompanyName );
+
+    		coupons.clear();
+
+    		if( c.moveToFirst() ) // at least one row was returned
+    		{
+    			do
+    			{
+    				Log.d(TAG, "rowId = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));	
+    				Log.d(TAG, "company name = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)));
+    				Log.d(TAG, "coupon details = "+c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)));
+    				
+    				boolean favorite;
+    				int fav = c.getInt(c.getColumnIndex(DBAdapter.KEY_FAVORITE));
+    				if( fav == 0 )
+    				{
+    					favorite = false;
+    				}
+    				else
+    				{
+    					favorite = true;
+    				}
+    				Log.d(TAG, "favorites = " + fav );
+    				Log.d(TAG, "Exp Date = "+c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)));
+    				Log.d(TAG, "Logo = "+c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)));
+    				Log.d(TAG, "Date Used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
+
+    				double distance = getDistance( 1.0, 1.0 );
+    				if( useLocations )
+    				{
+    					Log.d(LOCATION_TAG, "Finding location for coupon (useLocations = true)");
+    				
+    					float results[] = {(float) 0.0, (float) 0.0, (float) 0.0};
+    					Log.d(TAG, "Current latitude: " + currentLocation.getLatitude() + ", Current longitude: " + currentLocation.getLongitude() );
+    					
+    					Location.distanceBetween( currentLocation.getLatitude(), currentLocation.getLongitude(), 
+    							c.getFloat(c.getColumnIndex(DBAdapter.KEY_LATITUDE)), c.getFloat(c.getColumnIndex(DBAdapter.KEY_LONGITUDE)), results );
+    					distance = results[0];
+    				}
+    				else
+    				{
+    					Log.d(TAG, "Setting distance for coupon to 0.0 (useLocations = false)");
+    					distance = -1.0;
+    				}					
+    				Log.d(LOCATION_TAG, "Distance = "+distance);
+    				
+    				//String name, String exp_date, String pic, String detail, 
+    				//       boolean fav, int rowid, double dist, int date_used
+    				CouponObject newCoup = new CouponObject( c.getString(c.getColumnIndex(DBAdapter.KEY_COMPANY_NAME)),
+    						c.getString(c.getColumnIndex(DBAdapter.KEY_EXP_DATE)),
+    						c.getString(c.getColumnIndex(DBAdapter.KEY_FILE_URL)),
+    						c.getString(c.getColumnIndex(DBAdapter.KEY_COUPON_DETAILS)),
+    						favorite, 
+    						c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
+    						distance,
+    						0); // can simply put 0 for date_used since query only returned coups with this value
+    				coupons.add(newCoup);
+    			}while( c.moveToNext() );
+    		}
+    		else
+    		{
+    			Log.d(TAG, "No coupons in database.");
+    			return false;
+    		}
+    		db.close();	
+    		return true;
+    	}
+    	
+    	private BroadcastReceiver locationReceiver = new BroadcastReceiver() {
+
+    		@Override
+    		public void onReceive(Context context, Intent intent) {
+    			// received new location from location service
+    			Log.d(TAG, "In BrowseCouponsActivity BroadcastReceiver...got new location");
+    			if( mBound )
+    			{
+    				TryToGetLocation();
+    			}
+    		}
+    		
+    	};
+    	
+        private void CallSyncCoupons() 
+    	{
+    		if( IsConnected() ) {
+    			// go ahead and push coupon use back to server database
+    			db.open();
+    			Cursor c = db.getUsedCoupons();
+    			
+    			usedCoupons.clear();
+    			if( c.moveToFirst() ) // at least one row was returned
+    			{
+    				do
+    				{					
+    					boolean favorite;
+    					int fav = c.getInt(c.getColumnIndex(DBAdapter.KEY_FAVORITE));
+    					if( fav == 0 )
+    					{
+    						favorite = false;
+    					}
+    					else
+    					{
+    						favorite = true;
+    					}
+    					CouponObject newCoup = new CouponObject( "",//c.getString(c.getColumnIndex(KEY_COUPON_NAME)),
+    							"",//c.getString(c.getColumnIndex(KEY_EXP_DATE)),
+    							"",//c.getString(c.getColumnIndex(KEY_FILE_URL)),
+    							"",//c.getString(c.getColumnIndex(KEY_DETAILS_NAME)),
+    							favorite, 
+    							c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
+    							0, //distance,
+    							c.getInt( c.getColumnIndex(DBAdapter.KEY_DATE_USED)  ) ); // can simply put 0 for date_used since query only returned coups with this value
+    					usedCoupons.add(newCoup);
+    					
+    					//Log.d(TAG, "USED COUPON: event_id = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));
+    					//Log.d(TAG, "USED COUPON: date_used = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_DATE_USED)));
+    				}while( c.moveToNext() );
+    				db.close();
+    				CouponObject[] usedCoups = new CouponObject[usedCoupons.size()];
+    				usedCoups = usedCoupons.toArray(usedCoups);
+    				new SyncUsedCoupons().execute(usedCoups);
+    			}
+    			else
+    			{
+    				db.close();
+    				Log.d(TAG, "No used coupons in database.");
+    			}
+    		}
+    		else
+    		{
+    			// sync later
+    		}
+    	}
+
+    	
+    	private void CallSyncRecvdCoupons() 
+    	{
+    		if( IsConnected() ) {
+    			// go ahead and push coupon use back to server database
+    			db.open();
+    			Cursor c = db.getUnsyncedCoupons();
+    			
+    			unsyncedCoupons.clear();
+    			if( c.moveToFirst() ) // at least one row was returned
+    			{
+    				do
+    				{					
+    					CouponObject newCoup = new CouponObject( "",//c.getString(c.getColumnIndex(KEY_COUPON_NAME)),
+    							"",//c.getString(c.getColumnIndex(KEY_EXP_DATE)),
+    							"",//c.getString(c.getColumnIndex(KEY_FILE_URL)),
+    							"",//c.getString(c.getColumnIndex(KEY_DETAILS_NAME)),
+    							false, 
+    							c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)),
+    							0, //distance,
+    							0 ); // can simply put 0 for date_used since query only returned coups with this value
+    					unsyncedCoupons.add(newCoup);
+    					
+    					Log.d(TAG, "UNSYNCED COUPON: event_id = "+c.getInt(c.getColumnIndex(DBAdapter.KEY_EVENTID)));
+    				}while( c.moveToNext() );
+    				db.close();
+    				CouponObject[] unsyncedCoups = new CouponObject[unsyncedCoupons.size()];
+    				unsyncedCoups = unsyncedCoupons.toArray(unsyncedCoups);
+    				new SyncRecvdCoupons().execute(unsyncedCoups);
+    			}
+    			else
+    			{
+    				db.close();
+    				Log.d(TAG, "No unsynced coupons in database.");
+    			}
+    		}
+    		else
+    		{
+    			// sync later
+    		}
+    	}
+    	
+    	private boolean mBound = false;
+    	
+    	private ServiceConnection mConnection = new ServiceConnection() {
+    	    public void onServiceConnected(ComponentName className,
+    	            IBinder service) {
+    	        // This is called when the connection with the service has been
+    	        // established, giving us the service object we can use to
+    	        // interact with the service.  We are communicating with our
+    	        // service through an IDL interface, so get a client-side
+    	        // representation of that from the raw service object.
+    	    	binder = (LocationServiceBinder)service;
+    	    	locationService = binder.getService();
+    	    	mBound = true;
+
+    			Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity: bound to location service");
+    			refreshActivity();
+    	    }
+
+    	    public void onServiceDisconnected(ComponentName className) {
+    	        // This is called when the connection with the service has been
+    	        // unexpectedly disconnected -- that is, its process crashed.
+    	    	mBound = false;
+    			Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity: bind to location service disconnected");
+    	    }
+    	};
+    	private boolean IsConnected() {
+
+    		ConnectivityManager conMgr = (ConnectivityManager)getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+    		NetworkInfo networkInfo = conMgr.getActiveNetworkInfo();
+    		
+    		return networkInfo != null && networkInfo.isConnected();
+    		
+    	}
+    
+    	private void TryToGetLocation() {
+    		
+    		if( mBound )
+    		{
+    			Location newLocation = locationService.getCurrentLocation();
+    			if( newLocation != null )
+    			{
+    				Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity.TryToGetLocation: getCurrentLocation not null");
+    				currentLocation = new Location(locationService.getCurrentLocation());
+    				useLocations = true;
+    			}
+    			else
+    			{
+    				Log.d(LocationService.LOCATION_SERVICE, "in BrowseCouponsActivity.TryToGetLocation: getCurrentLocation = null");
+    				useLocations = false;
+    			}
+    		}
+    		else
+    		{
+    			Log.d(LocationService.LOCATION_SERVICE, "in BrowseActivity.TryToGetLocation: mBound is false");
+    		}
+    	}
+    	
+
+    	private class SyncUsedCoupons extends AsyncTask<CouponObject, Integer, Boolean>{
+    		
+    		@Override
+    		protected Boolean doInBackground( CouponObject...couponObjects ) {
+    			Log.d(TAG, "In SyncUsedCoupons: ");
+    			for( int i = 0; i < couponObjects.length; i++ )
+    			{
+    				Log.d(TAG, "Coupon event_id = "+couponObjects[i].getRowId()+", date_used = "+couponObjects[i].getDateUsed());
+    			}
+    			SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREFS_FILE, 0);
+    			JSONArray coupons = new JSONArray();
+    			JSONObject user = new JSONObject();
+    			try {
+    				user.put("username", prefs.getString(LoginActivity.USERNAME, ""));
+    				for( int i = 0; i < couponObjects.length; i++ )
+    				{
+    					JSONObject coup = new JSONObject();
+    					coup.put("event_id", couponObjects[i].getRowId());
+    					coup.put("was_favorite", couponObjects[i].getFavorite());
+    					coup.put("date_used", couponObjects[i].getDateUsed());
+    					coupons.put(coup);
+    				}
+    				user.put("coupons", coupons);
+    			} catch (JSONException e1 ) {
+    				e1.printStackTrace();
+    			}
+    			
+    			try {
+    			// need to send json object "user" to server  
+    			HttpParams httpParams = new BasicHttpParams();
+    	        HttpConnectionParams.setConnectionTimeout(httpParams,
+    	                10000);
+    	        HttpConnectionParams.setSoTimeout(httpParams, 10000);
+    			HttpClient client = new DefaultHttpClient(httpParams);
+    			HttpPost request = new HttpPost("http://166.78.251.32/gnt/update_used_coupons.php");
+    		        request.setHeader("json", user.toString());
+    		        //Log.d(TAG, "JSON Object = "+user.toString());
+    		        request.getParams().setParameter("jsonpost", user);
+    		        HttpResponse response = client.execute(request);
+    		        HttpEntity entity = response.getEntity();
+    		        if (entity != null) {
+    		            InputStream is = entity.getContent();
+    		            BufferedInputStream in;
+    					if( is != null )
+    					{
+    						Log.d(TAG, "got input stream from urlConnection");
+    						in = new BufferedInputStream(is);
+    					}
+    					else
+    					{
+    						Log.d(TAG, "urlConnection.getInputStream() failed");
+    						return null;
+    					}
+    			        Log.d(TAG, "got input stream");
+    		         
+    		            ByteArrayBuffer baf = new ByteArrayBuffer(500);
+    		            int current = 0;
+    		            while( (current = in.read()) != -1 ) {
+    		            	baf.append((byte) current);
+    		            	//Log.d(TAG, "byte = "+current);
+    		            }
+    		            in.close();
+    		            Log.d(TAG, "BAF: "+baf.toString());
+    		            JSONObject json = new JSONObject(new String(baf.toByteArray(), "utf-8"));
+    		            //JSONObject json = new JSONObject(new String(baf.toString()));
+
+    		            Log.d(TAG, "Created JSON return object");
+//    		            String temp = json.getString("error");
+//    		            Log.d(TAG, "error string returned = "+temp);
+    		            if( json.getString("error").equals("none") )
+    		            //if( json.getBoolean("success") )
+    		            {
+    		            	db.open();
+    		            	Log.d(TAG, "Successful update...should delete from local database.");
+    		            	for( int i = 0; i < couponObjects.length; i++ )
+    						{ 
+    							int rowId = couponObjects[i].getRowId();
+    							Log.d(TAG, "Trying to delete coupon with event_id = "+rowId);
+    							
+    							if( !db.deleteCoupon(rowId) )
+    							{
+    								Log.d(TAG, "Failure updating local database (deleting coupon that was used and synced)");
+    							}
+    							else
+    							{
+    								Log.d(TAG, "Succesfully updated local database: deleted coupon with event_id = "+rowId);
+    							}
+    						}
+    		            	db.close();
+    		            }
+    		            else
+    		            {
+    		            	Log.d(TAG, "Error updating database in server trying to sync used coupons.");
+    		            }
+    		            //String result = EntityUtils.toString(entity);
+    		            //Log.d(TAG, "Read from server:" + result);
+    		        }
+    			} catch (Throwable t) {
+    				Log.d(TAG,  "Error in the Http Request somewhere trying to sync used coupons.");
+    				t.printStackTrace();
+    			}
+    			return false;
+    		}
+
+    		
+    	}
+    	
+    	
+    	private class SyncRecvdCoupons extends AsyncTask<CouponObject, Integer, Boolean>{
+    		
+    		@Override
+    		protected Boolean doInBackground( CouponObject...couponObjects ) {
+    			Log.d(TAG, "In SyncRecvdCoupons: ");
+    			SharedPreferences prefs = getActivity().getSharedPreferences(MainActivity.PREFS_FILE, 0);
+    			JSONArray coupons = new JSONArray();
+    			JSONObject user = new JSONObject();
+    			try {
+    				user.put("username", prefs.getString(LoginActivity.USERNAME, ""));
+    				for( int i = 0; i < couponObjects.length; i++ )
+    				{
+    					JSONObject coup = new JSONObject();
+    					coup.put("event_id", couponObjects[i].getRowId());
+    					coupons.put(coup);
+    				}
+    				user.put("coupons", coupons);
+    			} catch (JSONException e1 ) {
+    				e1.printStackTrace();
+    			}
+    			
+    			try {
+    			// need to send json object "user" to server  
+    			HttpParams httpParams = new BasicHttpParams();
+    	        HttpConnectionParams.setConnectionTimeout(httpParams,
+    	                10000);
+    	        HttpConnectionParams.setSoTimeout(httpParams, 10000);
+    			HttpClient client = new DefaultHttpClient(httpParams);
+    			HttpPost request = new HttpPost("http://166.78.251.32/gnt/update_synced_coupons.php");
+    			//StringEntity se = new StringEntity(user.toString());
+    			//request.setEntity(se);
+    			//request.setEntity(new ByteArrayEntity(user.toString().getBytes("UTF8")));
+    		        request.setHeader("json", user.toString());
+    		        request.getParams().setParameter("jsonpost", user);
+    		        HttpResponse response = client.execute(request);
+    		        HttpEntity entity = response.getEntity();
+    		        if (entity != null) {
+    		            InputStream is = entity.getContent();
+    		            BufferedInputStream in;
+    					if( is != null )
+    					{
+    						Log.d(TAG, "got input stream from urlConnection");
+    						in = new BufferedInputStream(is);
+    					}
+    					else
+    					{
+    						Log.d(TAG, "urlConnection.getInputStream() failed");
+    						return null;
+    					}
+    			        Log.d(TAG, "got input stream");
+    		         
+    		            ByteArrayBuffer baf = new ByteArrayBuffer(500);
+    		            int current = 0;
+    		            while( (current = in.read()) != -1 ) {
+    		            	baf.append((byte) current);
+    		            	//Log.d(TAG, "byte = "+current);
+    		            }
+    		            in.close();
+    		            Log.d(TAG, "BAF: "+baf.toString());
+    		            JSONObject json = new JSONObject(new String(baf.toByteArray(), "utf-8"));
+
+    		            if( json.getString("error").equals("none") )
+    		            {
+    		            	db.open();
+    		            	Log.d(TAG, "Successful update...should delete from local database.");
+    		            	for( int i = 0; i < couponObjects.length; i++ )
+    						{
+    							int rowId = couponObjects[i].getRowId();
+    							Log.d(TAG, "Trying to delete coupon with event_id = "+rowId);
+    							
+    							if( !db.markCouponSynced(rowId) )
+    							{
+    								Log.d(TAG, "Failure updating local database (not able to tell server that coupon was recieved)");
+    							}
+    							else
+    							{
+    								Log.d(TAG, "Succesfully updated local database: marked received: coupon with event_id = "+rowId);
+    							}
+    						}
+    		            	db.close();
+    		            }
+    		            else
+    		            {
+    		            	Log.d(TAG, "Error updating database in server.");
+    		            }
+    		            //String result = EntityUtils.toString(entity);
+    		            //Log.d(TAG, "Read from server:" + result);
+    		        }
+    			} catch (Throwable t) {
+    				Log.d(TAG,  "Error in the Http Request somewhere.");
+    				t.printStackTrace();
+    			}
+    			return false;
+    		}	
+    	}
+    	
+
     }
+    
+   
 
 }

@@ -29,6 +29,13 @@ public class CouponUsedDisplay extends Activity {
 		   TextView message = (TextView)findViewById( R.id.coupon_used_details );
 		   message.setText(couponDetail);
 	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		setResult(RESULT_OK);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -38,6 +45,7 @@ public class CouponUsedDisplay extends Activity {
 	}
 	
 	public void onClickDone(View view) {
+		setResult(RESULT_OK);
 		finish();
 	}
 

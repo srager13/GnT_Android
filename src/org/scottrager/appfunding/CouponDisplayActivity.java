@@ -111,8 +111,8 @@ public class CouponDisplayActivity extends FragmentActivity {
 	               		//Then go to thank you page
 	               		Intent intent = new Intent(CouponDisplayActivity.this, CouponUsedDisplay.class);
 	               		intent.putExtra("couponDetails", couponDetail);
-	               		startActivity(intent);
-	               		CouponDisplayActivity.this.finish();
+	               		startActivityForResult(intent, COUPON_REDEEMED_REQUEST);
+	               		//CouponDisplayActivity.this.finish();
 	                   }
 	               })
 	               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
